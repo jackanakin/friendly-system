@@ -1,4 +1,4 @@
-import AppConfig from "../@types/env/AppConfig";
+import AppConfig from "../@types/env/config/AppConfig";
 
 export default {
   WEB_URL: process.env.WEB_URL,

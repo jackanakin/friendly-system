@@ -1,6 +1,5 @@
 import { Request, Response } from "express";
-
-import CpeRecord from '../../models/CpeRecord';
+import { CpeRecord } from "../../../_lib/database/main";
 
 class CpeRecordSignalController {
     async get(req: Request, res: Response): Promise<any> {

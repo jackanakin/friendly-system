@@ -11,12 +11,8 @@ import PhonePrefixCity from '../../../app/models/PhonePrefixCity'
 
 const models = [IntegrationSettings, Ap, Cpe, CpeRecord, User, PhoneSubscriber, PhonePrefixCity];
 
-class Database {
+class Database {    
     constructor() {
-        this.init();
-    }
-
-    init() {
         this.connection = new Sequelize(databaseConfig);
         models
             .map(model => model.init(this.connection))

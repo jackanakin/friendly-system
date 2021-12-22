@@ -1,9 +1,10 @@
 import { Request, Response } from "express";
 import jsonwebtoken from 'jsonwebtoken';
 import * as Yup from 'yup';
+import bcrypt from 'bcryptjs';
 
-import User from '../../models/User';
 import authConfig from '../../../_config/auth';
+import { User } from "../../../_lib/database/main";
 
 class SessionController {
     async delete(req: Request, res: Response) {
@@ -47,9 +48,12 @@ class SessionController {
                 return res.status(401).json({ error: 'Authentication error' });
             }
 
-            if (!(await user.checkPassword(password))) {
+            const checkPassword = user.password_hash ? await bcrypt.compare(password, user.password_hash) : false;
+
+            if (!checkPassword) {
                 return res.status(401).json({ error: 'Authentication error' });
             }
+            
             const { id, name } = user as any;
 
             const tokens = jsonwebtoken.sign({ id }, authConfig.secret, {

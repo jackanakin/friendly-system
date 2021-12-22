@@ -1,5 +1,5 @@
 import Sequelize from 'sequelize';
-import databaseConfig from '../../../_config/database/mkData';
+import databaseConfig from '../../../_config/database/mk';
 
 class MKDatabase {
   async rawQuery(query) {
