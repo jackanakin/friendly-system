@@ -1,0 +1,1 @@
+Copyright © 2021 Jardel Kuhn (jackanakin) jardelkuhn@gmail.com
