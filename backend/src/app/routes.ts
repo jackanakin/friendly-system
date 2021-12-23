@@ -60,8 +60,5 @@ routes.get('/cpe_record/latest/:erp_cpe_id', CpeRecordLatestController.get);
 routes.get('/cpe_record/signal/:erp_cpe_id', CpeRecordSignalController.get);
 
 routes.get('/ap', ApController.index);
-//routes.get('/ftth/detail/:cpe_erp_cod', FtthController.findOne);
-//routes.get('/ftth/detail/signal/:cpe_erp_cod', FtthController.findOneSignal);
-//routes.get('/ftth/pop/index', CpeController.popsIndex);
 
 export default routes;
