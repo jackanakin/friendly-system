@@ -6,6 +6,7 @@ import bcrypt from 'bcryptjs';
 import authConfig from '../../../_config/auth';
 import { User } from "../../../_lib/database/main";
 import { internalErrorHandler } from "../../@exceptions/_handler/InternalErrorHandler";
+import SessionControllerErrors from "../../@messages/controllers/Session/SessionControllerErrors";
 
 class SessionController {
     async delete(req: Request, res: Response) {
@@ -35,7 +36,9 @@ class SessionController {
             });
 
             if (!(await schema.isValid(req.body))) {
-                return res.status(400).json({ error: 'Validation error' });
+                return res
+                    .status(SessionControllerErrors.authenticationError.code)
+                    .json({ error: SessionControllerErrors.authenticationError.message });
             }
 
             const { email, password } = req.body;
@@ -45,13 +48,16 @@ class SessionController {
             });
 
             if (!user) {
-                return res.status(401).json({ error: 'Authentication error' });
+                return res.status(SessionControllerErrors.authenticationError.code)
+                    .json({ error: SessionControllerErrors.authenticationError.message });
             }
 
             const checkPassword = user.password_hash ? await bcrypt.compare(password, user.password_hash) : false;
 
             if (!checkPassword) {
-                return res.status(401).json({ error: 'Authentication error' });
+                return res
+                    .status(SessionControllerErrors.authenticationError.code)
+                    .json({ error: SessionControllerErrors.authenticationError.message });
             }
 
             const { id, name } = user as any;
