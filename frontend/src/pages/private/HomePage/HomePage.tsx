@@ -1,5 +1,4 @@
 import * as React from "react";
-import Cookies from "js-cookie";
 
 import api from "../../../api/api";
 import { useAuth } from "../../../providers/auth/AuthProvider";
