@@ -26,7 +26,7 @@ export const TableTr = styled.tr`
   border: none;
   cursor: pointer;
   display: grid;
-  grid-template-columns: repeat(13, 1fr);
+  grid-template-columns: repeat(10, 1fr);
   justify-content: flex-start;
 `;
 

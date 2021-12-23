@@ -44,9 +44,6 @@ export default function AppMenu() {
           </ListItem>
         </List>
         <Divider />
-        <List>
-          {/*<ListItem component={Link} to="/integrations" button onClick={toggleDrawer}><ListItemText primary="Integrações" /></ListItem>*/}
-        </List>
       </div>
     </DefaultDrawer>
   );

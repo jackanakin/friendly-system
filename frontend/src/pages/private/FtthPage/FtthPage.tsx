@@ -217,16 +217,16 @@ export default function FtthPage() {
                     <FtthTableWrapper>
                         <tbody>
                             <TableTr>
-                                <TableTh id="name" scope="col">Nome</TableTh>
-                                <TableTh id="username" scope="col">Username</TableTh>
-                                <TableTh id="onu_serial" scope="col">Serial</TableTh>
-                                <TableTh id="nap" scope="col" >CTO</TableTh>
-                                <TableTh id="nap_port" scope="col" >Porta</TableTh>
-                                <TableTh id="last_rx" scope="col" >RX</TableTh>
-                                <TableTh id="last_tx" scope="col" >TX</TableTh>
-                                <TableTh id="last_software_version" scope="col" >Fw. Version</TableTh>
-                                <TableTh id="last_pon_index" scope="col" >PON Index</TableTh>
-                                <TableTh id="last_online" scope="col" >Última vista</TableTh>
+                                <TableTh style={{ width: 10 + "vw" }} id="name" scope="col">Nome</TableTh>
+                                <TableTh style={{ width: 12 + "vw" }} id="username" scope="col">Username</TableTh>
+                                <TableTh style={{ width: 6 + "vw" }} id="onu_serial" scope="col">Serial</TableTh>
+                                <TableTh style={{ width: 8 + "vw" }} id="nap" scope="col" >CTO</TableTh>
+                                <TableTh style={{ width: 2 + "vw" }} id="nap_port" scope="col" >Porta</TableTh>
+                                <TableTh style={{ width: 2 + "vw" }} id="last_rx" scope="col" >RX</TableTh>
+                                <TableTh style={{ width: 2 + "vw" }} id="last_tx" scope="col" >TX</TableTh>
+                                <TableTh style={{ width: 6 + "vw" }} id="last_software_version" scope="col" >Fw. Version</TableTh>
+                                <TableTh style={{ width: 6 + "vw" }} id="last_pon_index" scope="col" >PON Index</TableTh>
+                                <TableTh style={{ width: 6 + "vw" }} id="last_online" scope="col" >Última vista</TableTh>
                             </TableTr>
                         </tbody>
                         <tbody>

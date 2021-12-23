@@ -7,6 +7,8 @@ import Cpe from '../../../../@types/models/cpe/Cpe';
 import api from '../../../../api/api';
 import CpeRecord from '../../../../@types/models/cpe/CpeRecord';
 import { TableTd, TableTdExtra, TableTr } from '../styles';
+import { Button } from '@material-ui/core';
+import { ExtraTdContainer, ExtraTdContainerSeparator, ExtraContainer, CpeRecordContainer } from './FtthCpeRowStyles';
 
 interface FtthCpeRowProps {
     obj: Cpe;
@@ -93,24 +95,23 @@ const FtthCpeRow: React.FC<FtthCpeRowProps> = ({ obj }) => {
 
     return (
         <TableTr style={{ backgroundColor: !obj.online ? '#d67d78' : '#6bd17c' }}>
-            <TableTd onClick={() => triggerExpandRow()}><ArrowDropDownCircle />{"  "}{obj.name}</TableTd>
-            <TableTd>{obj.username}</TableTd>
-            <TableTd>{obj.onu_serial}</TableTd>
-            <TableTd>{obj.nap}</TableTd>
-            <TableTd>{obj.nap_port}</TableTd>
-            <TableTd>{obj.last_rx}</TableTd>
-            <TableTd>{obj.last_tx}</TableTd>
-            <TableTd>{obj.last_software_version}</TableTd>
-            <TableTd>{obj.last_pon_index}</TableTd>
-            <TableTd>{obj.last_online ? format(parseISO(obj.last_online), "dd/MM HH:mm") : 'Nunca'}</TableTd>
+            <TableTd style={{ width: 10 + "vw" }} onClick={() => triggerExpandRow()}><ArrowDropDownCircle />{"  "}{obj.name}</TableTd>
+            <TableTd style={{ width: 12 + "vw" }}>{obj.username}</TableTd>
+            <TableTd style={{ width: 6 + "vw" }}>{obj.onu_serial}</TableTd>
+            <TableTd style={{ width: 8 + "vw" }}>{obj.nap}</TableTd>
+            <TableTd style={{ width: 2 + "vw" }}>{obj.nap_port}</TableTd>
+            <TableTd style={{ width: 2 + "vw" }}>{obj.last_rx}</TableTd>
+            <TableTd style={{ width: 2 + "vw" }}>{obj.last_tx}</TableTd>
+            <TableTd style={{ width: 6 + "vw" }}>{obj.last_software_version}</TableTd>
+            <TableTd style={{ width: 6 + "vw" }}>{obj.last_pon_index}</TableTd>
+            <TableTd style={{ width: 6 + "vw" }}>{obj.last_online ? format(parseISO(obj.last_online), "dd/MM HH:mm") : 'Nunca'}</TableTd>
             <TableTdExtra style={{ display: expandRow ? '' : 'none' }}>
                 <div style={{ flexDirection: 'row' }}>
-                    <div style={{ display: 'flex', flexDirection: 'row', alignItems: 'center' }}>
-                        <button onClick={() => fetchSignal()}>
-                            <EmojiObjects />
-                            <p>Ler sinal agora</p>
-                        </button>
-                        <div style={{ margin: '5px' }}>
+                    <ExtraTdContainer>
+                        <Button onClick={() => fetchSignal()} variant="contained" endIcon={<EmojiObjects />}>
+                            Ler sinal agora
+                        </Button>
+                        <ExtraContainer>
                             {
                                 (fetchSignalNowStatus) ? <p>{fetchSignalNowStatus}</p> :
                                     (signalNow &&
@@ -121,15 +122,16 @@ const FtthCpeRow: React.FC<FtthCpeRowProps> = ({ obj }) => {
                                         </div>
                                     )
                             }
-                        </div>
-                    </div>
-                    <div style={{ display: 'flex', flexDirection: 'row', alignItems: 'center' }}>
-                        <button onClick={() => fetchCpeSignalRecords()}>
-                            <GraphicEqOutlined />
-                            <p>Histórico de sinal</p>
-                        </button>
-                        {fetchSignalHistoryStatus ? fetchSignalHistoryStatus :
-                            <div>
+                        </ExtraContainer>
+                    </ExtraTdContainer>
+                    <ExtraTdContainerSeparator />
+
+                    <ExtraTdContainer>
+                        <Button onClick={() => fetchCpeSignalRecords()} variant="contained" endIcon={<GraphicEqOutlined />}>
+                            Histórico de sinal
+                        </Button>
+                        {fetchSignalHistoryStatus ? fetchSignalHistoryStatus : cpeRecordSignal.length > 0 &&
+                            <ExtraContainer>
                                 <LineChart width={800} height={200} data={cpeRecordSignal}>
                                     <Tooltip />
                                     <XAxis dataKey="date" />
@@ -139,26 +141,27 @@ const FtthCpeRow: React.FC<FtthCpeRowProps> = ({ obj }) => {
                                     <Legend />
                                     <CartesianGrid stroke="#ccc" />
                                 </LineChart>
-                            </div>
+                            </ExtraContainer>
                         }
-                    </div>
-                    <div style={{ display: 'flex', flexDirection: 'row', alignItems: 'center' }}>
-                        <button onClick={() => triggerExpandExtra()}>
-                            <Details />
-                            <p>Detalhes da ONU</p>
-                        </button>
+                    </ExtraTdContainer>
+                    <ExtraTdContainerSeparator />
+
+                    <ExtraTdContainer>
+                        <Button onClick={() => triggerExpandExtra()} variant="contained" endIcon={<Details />}>
+                            Detalhes da ONU
+                        </Button>
                         {
                             showExtra &&
-                            <div style={{ display: 'flex', flexDirection: 'row' }}>
-                                <div>
+                            <ExtraContainer>
+                                <CpeRecordContainer>
                                     <p>Cadastrado: {obj.cadastrado}</p>
                                     <p>MAC no MK: {obj.mac_address}</p>
                                     <p>Pos. na PON: {obj.last_pon_index}</p>
                                     <p>Hw.: {obj.last_hardware_version}</p>
                                     <p>Sw.: {obj.last_software_version}</p>
-                                </div>
+                                </CpeRecordContainer>
                                 {latestCpeRecord &&
-                                    <div style={{ marginLeft: 11 }}>
+                                    <CpeRecordContainer>
                                         <h5>Config. da ONU: {format(parseISO(latestCpeRecord.datetime), "dd/MM HH:mm")}</h5>
                                         <p>ONU em NAT?: {latestCpeRecord.wan_pppoe_username ? "sim" : "não"}</p>
                                         <p>Porta: {latestCpeRecord.port_name}</p>
@@ -166,11 +169,11 @@ const FtthCpeRow: React.FC<FtthCpeRowProps> = ({ obj }) => {
                                         <p>VLAN: {latestCpeRecord.port_vlan}</p>
                                         <p>ARP ONU: {latestCpeRecord.port_mac}</p>
                                         <p>Telefone na ONU: {latestCpeRecord.tel_num}</p>
-                                    </div>
+                                    </CpeRecordContainer>
                                 }
-                            </div>
+                            </ExtraContainer>
                         }
-                    </div>
+                    </ExtraTdContainer>
                 </div>
             </TableTdExtra>
         </TableTr>

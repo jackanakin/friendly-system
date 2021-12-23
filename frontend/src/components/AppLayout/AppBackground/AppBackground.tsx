@@ -1,6 +1,4 @@
 import React from 'react';
-import PropTypes from 'prop-types';
-
 
 import { Wrapper } from './styles';
 import AppBar from '../AppBar/AppBar';
@@ -15,7 +13,3 @@ export default function AppBackground({ children }: { children: React.ReactNode 
     </Wrapper>
   );
 }
-
-AppBackground.prototype = {
-  children: PropTypes.element.isRequired,
-};
