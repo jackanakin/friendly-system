@@ -2,7 +2,7 @@ import { Request, Response } from "express";
 import { CpeRecord } from "../../../_lib/database/main";
 import { internalErrorHandler } from "../../@exceptions/_handler/InternalErrorHandler";
 
-class CpeRecordSignalController {
+class CpeRxTxHistoryController {
     async get(req: Request, res: Response): Promise<any> {
         try {
             const erp_cpe_id = req.params.erp_cpe_id;
@@ -14,7 +14,7 @@ class CpeRecordSignalController {
                     ['datetime', 'DESC']
                 ],
                 limit: 2
-            }) as any;
+            });
 
             return res.json(cpeRecords);
         } catch (error) {
@@ -23,4 +23,4 @@ class CpeRecordSignalController {
     }
 }
 
-export default new CpeRecordSignalController();
+export default new CpeRxTxHistoryController();
