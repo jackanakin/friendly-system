@@ -21,38 +21,15 @@ routes.post('/sessions', SessionController.store);
  * Authentication middleware
  */
 routes.use(SessionValidatorMiddleware);
-routes.delete('/sessions', SessionController.delete);
 
 /**
  * Authenticated routes only
  */
 
-/*routes.get('/', FeedController.index);
-routes.get('/stats', StatsMonitorController.index);
-routes.get('/stats/:channelPath', RealTimeStatsDetailController.index);
-
-routes.get('/historystats', DailyStatsController.index);
-
-routes.get('/channels', ChannelController.store);
-routes.get('/channels/:channelPath', ChannelController.index);
-*/
-
+routes.delete('/sessions', SessionController.delete);
 routes.get('/phone_subscriber', PhoneSubscriberController.index);
 routes.get('/phone_subscriber/inconsistences', PhoneSubscriberInconsistencesController.index);
 
-//routes.get('/ura/rating', UraReportController.index);
-//routes.get('/ura/detailed', UraReportController.indexDetailed);
-
-//routes.get('/billingcheck', BillingCheckController.index);
-//routes.get('/idlesubscriber', IdleSubscriberController.index);
-
-//routes.get('/attendancereport', AttendanceReportController.index);
-
-//routes.get('/iptvsettings', IptvSettingsController.index);
-//routes.post('/iptvintegration', IptvIntegrationController.store);
-//routes.get('/apintegration', ApIntegrationController.index);
-
-//routes.get('/sysloghistory', SyslogHistoryController.index);
 
 routes.get('/cpe/:ap_id', CpeController.index);
 routes.get('/cpe/details/:erp_cpe_id', CpeDetailsController.get);
