@@ -1,7 +1,6 @@
 import { Request, Response } from "express";
 
-import PhoneSubscriberTS from "../../../@types/models/PhoneSubscriber";
-import CpeWithLatestCpeRecordDTO from "../../../@types/services/phone_subscriber/CpeWithLatestCpeRecordDTO";
+import CpeWithLatestCpeRecordDTO from "../../../@types/dto/services/PhoneSubscriber/CpeWithLatestCpeRecordDTO";
 import { PhoneSubscriber } from "../../../_lib/database/main";
 import { internalErrorHandler } from "../../@exceptions/_handler/InternalErrorHandler";
 import GetCompletePhoneSubscriberInfoService from "../../services/PhoneSubscriber/GetCompletePhoneSubscriberInfoService";
@@ -13,7 +12,7 @@ class PhoneSubscriberController {
                 order: [
                     ['erp_contract_id', 'ASC']
                 ]
-            }) as any as PhoneSubscriberTS[];
+            });
 
             const subscribers_info = await GetCompletePhoneSubscriberInfoService.all();
             phoneSubscribers.forEach(ps => {

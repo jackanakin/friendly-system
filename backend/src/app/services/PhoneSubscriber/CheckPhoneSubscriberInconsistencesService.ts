@@ -1,10 +1,8 @@
-import PhoneSubscriberTS from "../../../@types/models/PhoneSubscriber";
-import PhonePrefixCityTS from "../../../@types/models/PhonePrefixCity";
-import CpeWithLatestCpeRecordDTO from "../../../@types/services/phone_subscriber/CpeWithLatestCpeRecordDTO";
-import PhoneSubscriberInconsistenceDTO from "../../../@types/services/phone_subscriber/PhoneSubscriberInconsistenceDTO";
-
 import GetCompletePhoneSubscriberInfoService from "../../services/PhoneSubscriber/GetCompletePhoneSubscriberInfoService";
 import { PhonePrefixCity, PhoneSubscriber } from "../../../_lib/database/main";
+import PhoneSubscriberServiceErrors from "../../@messages/services/PhoneSubscriber/PhoneSubscriberServiceErrors";
+import PhoneSubscriberInconsistenceDTO from "../../../@types/dto/services/PhoneSubscriber/PhoneSubscriberInconsistenceDTO";
+import CpeWithLatestCpeRecordDTO from "../../../@types/dto/services/PhoneSubscriber/CpeWithLatestCpeRecordDTO";
 
 class CheckPhoneSubscriberInconsistencesService {
   async run(): Promise<PhoneSubscriberInconsistenceDTO[]> {
@@ -14,8 +12,8 @@ class CheckPhoneSubscriberInconsistencesService {
       order: [
         ['erp_contract_id', 'ASC']
       ]
-    }) as any as PhoneSubscriberTS[];
-    const prefixCityList = await PhonePrefixCity.findAll({}) as any as PhonePrefixCityTS[];
+    });
+    const prefixCityList = await PhonePrefixCity.findAll({});
 
     if (phoneSubscribers.length > 0) {
       const subscribers_info = await GetCompletePhoneSubscriberInfoService.all();
@@ -97,11 +95,11 @@ class CheckPhoneSubscriberInconsistencesService {
           inconsistent.push({ inconsistence_message } as PhoneSubscriberInconsistenceDTO);
         });
       });
-      console.log(inconsistent.length)
+
       return inconsistent;
     }
 
-    throw new Error('CheckPhoneSubscriberInconsistencesService: phoneSubscribers.length == 0');
+    throw new Error(PhoneSubscriberServiceErrors.phoneSubscribersEmpty.message);
   }
 }
 

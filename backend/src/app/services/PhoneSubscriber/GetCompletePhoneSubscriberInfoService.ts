@@ -1,6 +1,6 @@
 import { QueryTypes } from 'sequelize';
+import CpeWithLatestCpeRecordDTO from '../../../@types/dto/services/PhoneSubscriber/CpeWithLatestCpeRecordDTO';
 
-import CpeWithLatestCpeRecordDTO from '../../../@types/services/phone_subscriber/CpeWithLatestCpeRecordDTO';
 import { database } from '../../../_lib/database/main';
 
 class GetCompletePhoneSubscriberInfoService {
