@@ -1,6 +1,6 @@
 import { Request, Response } from "express";
 
-import DefaultResponseMessage from "../../response_messages/default/DefaultResponseMessage";
+import { internalErrorHandler } from "../../@exceptions/_handler/InternalErrorHandler";
 import CheckPhoneSubscriberInconsistencesService from "../../services/PhoneSubscriber/CheckPhoneSubscriberInconsistencesService";
 
 class PhoneSubscriberInconsistencesController {
@@ -8,13 +8,9 @@ class PhoneSubscriberInconsistencesController {
         try {
             const inconsistences = await CheckPhoneSubscriberInconsistencesService.run();
             return res.json(inconsistences);
-        } catch (err) {
-            console.log(err);
+        } catch (error) {
+            return internalErrorHandler(error, res);
         }
-
-        return res
-            .status(DefaultResponseMessage.internal.code)
-            .json({ error: DefaultResponseMessage.internal.message });
     }
 }
 

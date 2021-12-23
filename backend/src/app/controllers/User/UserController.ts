@@ -1,7 +1,7 @@
 import { Request, Response } from "express";
 import * as Yup from 'yup';
 
-import User from '../../models/User';
+import { User } from "../../../_lib/database/main";
 
 class UserController {
     async store(req: Request, res: Response) {

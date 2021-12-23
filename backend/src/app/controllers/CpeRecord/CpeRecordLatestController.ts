@@ -1,23 +1,28 @@
 import { Request, Response } from "express";
 import { CpeRecord } from "../../../_lib/database/main";
+import { internalErrorHandler } from "../../@exceptions/_handler/InternalErrorHandler";
 
 class CpeRecordLatestController {
     async get(req: Request, res: Response): Promise<any> {
-        const erp_cpe_id = req.params.erp_cpe_id;
-        console.log("herererere")
-        const cpeRecord = await CpeRecord.findAll({
-            where: { erp_cpe_id: erp_cpe_id, online: true },
-            order: [
-                ['datetime', 'DESC']
-            ],
-            limit: 1
-        }) as any;
+        try {
+            const erp_cpe_id = req.params.erp_cpe_id;
+            console.log("herererere")
+            const cpeRecord = await CpeRecord.findAll({
+                where: { erp_cpe_id: erp_cpe_id, online: true },
+                order: [
+                    ['datetime', 'DESC']
+                ],
+                limit: 1
+            }) as any;
 
-        if (cpeRecord.length > 0) {
-            return res.json(cpeRecord[0]);
+            if (cpeRecord.length > 0) {
+                return res.json(cpeRecord[0]);
+            }
+
+            return res.json(null);
+        } catch (error) {
+            return internalErrorHandler(error, res);
         }
-
-        return res.json(null);
     }
 }
 

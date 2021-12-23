@@ -5,6 +5,7 @@ import bcrypt from 'bcryptjs';
 
 import authConfig from '../../../_config/auth';
 import { User } from "../../../_lib/database/main";
+import { internalErrorHandler } from "../../@exceptions/_handler/InternalErrorHandler";
 
 class SessionController {
     async delete(req: Request, res: Response) {
@@ -19,10 +20,9 @@ class SessionController {
             });
 
             return res.status(200).send();
-        } catch (err) {
-            console.log(err);
+        } catch (error) {
+            return internalErrorHandler(error, res);
         }
-        return res.status(500).send();
     }
 
     async store(req: Request, res: Response) {
@@ -53,7 +53,7 @@ class SessionController {
             if (!checkPassword) {
                 return res.status(401).json({ error: 'Authentication error' });
             }
-            
+
             const { id, name } = user as any;
 
             const tokens = jsonwebtoken.sign({ id }, authConfig.secret, {
@@ -74,9 +74,8 @@ class SessionController {
             });
 
             return res.status(200).send();
-        } catch (err) {
-            console.log(err);
-            return res.status(500).json({ error: 'Authentication error' });
+        } catch (error) {
+            return internalErrorHandler(error, res);
         }
     }
 }

@@ -1,4 +1,5 @@
 import { Request, Response } from "express";
+import { internalErrorHandler } from "../../@exceptions/_handler/InternalErrorHandler";
 import snmpagentApi from "../../services/SnmpAgentAPI/SnmpAgentApi";
 
 class CpeLiveSignalController {
@@ -10,12 +11,9 @@ class CpeLiveSignalController {
             data.date = date;
 
             return res.json(data);
-        } catch (err: any) {
-            console.log("CpeLiveSignalController:get:exception");
-            console.log(String(err));
+        } catch (error) {
+            return internalErrorHandler(error, res);
         }
-
-        return res.json({error: "Internal error"}).status(500);
     }
 }
 

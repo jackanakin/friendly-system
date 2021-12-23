@@ -2,6 +2,7 @@ import { NextFunction, Request, Response } from "express";
 import jwt from 'jsonwebtoken';
 
 import authConfig from '../../_config/auth';
+import { internalErrorHandler } from "../@exceptions/_handler/InternalErrorHandler";
 
 export default async (req: Request, res: Response, next: NextFunction) => {
     try {
@@ -18,9 +19,7 @@ export default async (req: Request, res: Response, next: NextFunction) => {
         } catch (err) {
             return res.status(401).json({ error: 'token invalid' });
         }
-    } catch (err) {
-        console.log(err);
+    } catch (error) {
+        return internalErrorHandler(error, res);
     }
-
-    return res.status(500).json({ error: 'Authorization error' });
 };
