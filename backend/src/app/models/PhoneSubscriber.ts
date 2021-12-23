@@ -13,7 +13,6 @@ export interface PhoneSubscriberAttributes {
     city: string;
 }
 export interface PhoneSubscriberModel extends Model<PhoneSubscriberAttributes>, PhoneSubscriberAttributes { }
-export class PhoneSubscriber extends Model<PhoneSubscriberModel, PhoneSubscriberAttributes> { }
 
 export type PhoneSubscriberStatic = typeof Model & {
     new(values?: object, options?: BuildOptions): PhoneSubscriberModel;

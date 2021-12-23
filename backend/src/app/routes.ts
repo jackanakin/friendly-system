@@ -8,8 +8,8 @@ import CpeRecordSignalController from './controllers/CpeRecord/CpeRecordSignalCo
 import CpeRecordLatestController from './controllers/CpeRecord/CpeRecordLatestController'
 import SessionController from './controllers/Session/SessionController';
 import ApController from './controllers/Ap/ApController';
-//import PhoneSubscriberController from './controllers/PhoneSubscriber/PhoneSubscriberController';
-//import PhoneSubscriberInconsistencesController from './controllers/PhoneSubscriber/PhoneSubscriberInconsistencesController';
+import PhoneSubscriberController from './controllers/PhoneSubscriber/PhoneSubscriberController';
+import PhoneSubscriberInconsistencesController from './controllers/PhoneSubscriber/PhoneSubscriberInconsistencesController';
 
 const routes = Router();
 
@@ -38,8 +38,8 @@ routes.get('/channels', ChannelController.store);
 routes.get('/channels/:channelPath', ChannelController.index);
 */
 
-//routes.get('/phone_subscriber', PhoneSubscriberController.index);
-//routes.get('/phone_subscriber/inconsistences', PhoneSubscriberInconsistencesController.index);
+routes.get('/phone_subscriber', PhoneSubscriberController.index);
+routes.get('/phone_subscriber/inconsistences', PhoneSubscriberInconsistencesController.index);
 
 //routes.get('/ura/rating', UraReportController.index);
 //routes.get('/ura/detailed', UraReportController.indexDetailed);

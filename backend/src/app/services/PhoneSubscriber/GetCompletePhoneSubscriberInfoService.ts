@@ -1,11 +1,11 @@
 import { QueryTypes } from 'sequelize';
-/*
-import Database from '../../../_lib/database/main/index';
+
 import CpeWithLatestCpeRecordDTO from '../../../@types/services/phone_subscriber/CpeWithLatestCpeRecordDTO';
+import { database } from '../../../_lib/database/main';
 
 class GetCompletePhoneSubscriberInfoService {
   async all(): Promise<CpeWithLatestCpeRecordDTO[]> {
-    const records = await Database.connection.query(
+    const records = await database.query(
       ` SELECT DISTINCT ON (ps.phone_number) ps.phone_number, ps.name AS subscriber_name, ps.city AS city,
         cpe.*, cper.*, ap.voice_vlan AS ap_voice_vlan, ap.data_vlan AS ap_data_vlan, ap.description AS ap_name
         FROM phone_subscriber ps 
@@ -23,4 +23,3 @@ class GetCompletePhoneSubscriberInfoService {
 }
 
 export default new GetCompletePhoneSubscriberInfoService();
-*/

@@ -34,7 +34,6 @@ export interface CpeAttributes {
     last_software_version: string;
 }
 export interface CpeModel extends Model<CpeAttributes>, CpeAttributes { }
-export class Cpe extends Model<CpeModel, CpeAttributes> { }
 
 export type CpeStatic = typeof Model & {
     new(values?: object, options?: BuildOptions): CpeModel;

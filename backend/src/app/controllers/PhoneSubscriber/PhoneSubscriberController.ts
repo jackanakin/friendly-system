@@ -1,8 +1,8 @@
 import { Request, Response } from "express";
 import PhoneSubscriberTS from "../../../@types/models/PhoneSubscriber";
 import CpeWithLatestCpeRecordDTO from "../../../@types/services/phone_subscriber/CpeWithLatestCpeRecordDTO";
-/*
-import PhoneSubscriber from '../../models/PhoneSubscriber';
+import { PhoneSubscriber } from "../../../_lib/database/main";
+
 import DefaultResponseMessage from "../../response_messages/default/DefaultResponseMessage";
 import GetCompletePhoneSubscriberInfoService from "../../services/PhoneSubscriber/GetCompletePhoneSubscriberInfoService";
 
@@ -44,4 +44,3 @@ class PhoneSubscriberController {
 }
 
 export default new PhoneSubscriberController();
-*/

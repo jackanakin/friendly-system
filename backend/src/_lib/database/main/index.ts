@@ -10,19 +10,19 @@ import { PhoneSubscriberFactory } from "../../../app/models/PhoneSubscriber";
 import { PhonePrefixCityFactory } from "../../../app/models/PhonePrefixCity";
 import { UserFactory, UserModel } from "../../../app/models/User";
 
-export const dbConfig = new sequelize.Sequelize(
+export const database = new sequelize.Sequelize(
     databaseConfig
 );
 
 // SOMETHING VERY IMPORTANT them Factory functions expect a
 // sequelize instance as parameter give them `dbConfig`
 
-export const Ap = ApFactory(dbConfig);
-export const Cpe = CpeFactory(dbConfig);
-export const CpeRecord = CpeRecordFactory(dbConfig);
-export const User = UserFactory(dbConfig);
-export const PhoneSubscriber = PhoneSubscriberFactory(dbConfig);
-export const PhonePrefixCity = PhonePrefixCityFactory(dbConfig);
+export const Ap = ApFactory(database);
+export const Cpe = CpeFactory(database);
+export const CpeRecord = CpeRecordFactory(database);
+export const User = UserFactory(database);
+export const PhoneSubscriber = PhoneSubscriberFactory(database);
+export const PhonePrefixCity = PhonePrefixCityFactory(database);
 
 // Users have skills then lets create that relationship
 User.addHook('beforeSave', async (user: UserModel) => {

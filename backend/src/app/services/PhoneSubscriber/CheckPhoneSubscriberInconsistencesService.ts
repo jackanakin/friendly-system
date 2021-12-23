@@ -2,10 +2,9 @@ import PhoneSubscriberTS from "../../../@types/models/PhoneSubscriber";
 import PhonePrefixCityTS from "../../../@types/models/PhonePrefixCity";
 import CpeWithLatestCpeRecordDTO from "../../../@types/services/phone_subscriber/CpeWithLatestCpeRecordDTO";
 import PhoneSubscriberInconsistenceDTO from "../../../@types/services/phone_subscriber/PhoneSubscriberInconsistenceDTO";
-import PhonePrefixCity from "../../models/PhonePrefixCity";
 
-import PhoneSubscriber from '../../models/PhoneSubscriber';
 import GetCompletePhoneSubscriberInfoService from "../../services/PhoneSubscriber/GetCompletePhoneSubscriberInfoService";
+import { PhonePrefixCity, PhoneSubscriber } from "../../../_lib/database/main";
 
 class CheckPhoneSubscriberInconsistencesService {
   async run(): Promise<PhoneSubscriberInconsistenceDTO[]> {

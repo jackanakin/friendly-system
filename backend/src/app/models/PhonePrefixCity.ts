@@ -6,7 +6,6 @@ export interface PhonePrefixCityAttributes {
     city: string;
 }
 export interface PhonePrefixCityModel extends Model<PhonePrefixCityAttributes>, PhonePrefixCityAttributes { }
-export class PhonePrefixCity extends Model<PhonePrefixCityModel, PhonePrefixCityAttributes> { }
 
 export type PhonePrefixCityStatic = typeof Model & {
     new(values?: object, options?: BuildOptions): PhonePrefixCityModel;

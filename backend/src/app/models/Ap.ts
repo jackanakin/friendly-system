@@ -14,7 +14,6 @@ export interface ApAttributes {
     enabled: boolean;
 }
 export interface ApModel extends Model<ApAttributes>, ApAttributes { }
-export class Ap extends Model<ApModel, ApAttributes> { }
 
 export type ApStatic = typeof Model & {
     new(values?: object, options?: BuildOptions): ApModel;

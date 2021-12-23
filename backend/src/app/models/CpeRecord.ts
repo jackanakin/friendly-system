@@ -61,7 +61,6 @@ export interface CpeRecordAttributes {
     datetime: Date;
 }
 export interface CpeRecordModel extends Model<CpeRecordAttributes>, CpeRecordAttributes { }
-export class CpeRecord extends Model<CpeRecordModel, CpeRecordAttributes> { }
 
 export type CpeRecordStatic = typeof Model & {
     new(values?: object, options?: BuildOptions): CpeRecordModel;

@@ -1,5 +1,4 @@
 import { BuildOptions, DataTypes, Model, Sequelize } from "sequelize";
-import bcrypt from 'bcryptjs';
 
 export interface UserAttributes {
     name: string;
@@ -9,7 +8,6 @@ export interface UserAttributes {
     enabled: boolean;
 }
 export interface UserModel extends Model<UserAttributes>, UserAttributes { }
-export class User extends Model<UserModel, UserAttributes> { }
 export type UserStatic = typeof Model & {
     new(values?: object, options?: BuildOptions): UserModel;
 };
@@ -51,5 +49,3 @@ export function UserFactory(sequelize: Sequelize): UserStatic {
         },
     }, { timestamps: false });
 }
-
-export default User;
