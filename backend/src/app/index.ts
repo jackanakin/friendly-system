@@ -7,6 +7,7 @@ import appConfig from '../_config/app';
 import '../_lib/database/main';
 
 import routes from './routes';
+import LoggingMiddleware from './middlewares/LoggingMiddleware';
 
 class App {
   server: express.Application;
@@ -22,6 +23,7 @@ class App {
     this.server.use(cors({ origin: appConfig.WEB_URL, credentials: true }));
     this.server.use(cookieParser());
     this.server.use(express.json());
+    this.server.use(LoggingMiddleware);
   }
 
   routes() {

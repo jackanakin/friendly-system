@@ -10,6 +10,7 @@ declare global {
         interface Request {
             sourceSocket: Address;
             userId: number;
+            streamId: string;
         }
     }
 }

@@ -1,7 +1,5 @@
 import { Router } from 'express';
 
-import authMiddleware from './middlewares/auth';
-
 import CpeController from './controllers/Cpe/CpeController'
 import CpeLiveSignalController from './controllers/Cpe/CpeLiveSignalController'
 import CpeRecordSignalController from './controllers/CpeRecord/CpeRecordSignalController'
@@ -10,6 +8,7 @@ import SessionController from './controllers/Session/SessionController';
 import ApController from './controllers/Ap/ApController';
 import PhoneSubscriberController from './controllers/PhoneSubscriber/PhoneSubscriberController';
 import PhoneSubscriberInconsistencesController from './controllers/PhoneSubscriber/PhoneSubscriberInconsistencesController';
+import SessionValidatorMiddleware from './middlewares/SessionValidatorMiddleware';
 
 const routes = Router();
 
@@ -21,7 +20,7 @@ routes.post('/sessions', SessionController.store);
 /**
  * Authentication middleware
  */
-routes.use(authMiddleware);
+routes.use(SessionValidatorMiddleware);
 routes.delete('/sessions', SessionController.delete);
 
 /**
