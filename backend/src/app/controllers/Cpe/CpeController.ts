@@ -1,5 +1,5 @@
 import { Request, Response } from "express";
-import { Ap, Cpe, CpeRecord } from "../../../_lib/database/main";
+import { Ap, Cpe } from "../../../_lib/database/main";
 import { internalErrorHandler } from "../../@exceptions/_handler/InternalErrorHandler";
 
 class CpeController {
