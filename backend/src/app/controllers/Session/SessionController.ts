@@ -60,7 +60,7 @@ class SessionController {
                     .json({ error: SessionControllerErrors.authenticationError.message });
             }
 
-            const { id, name } = user as any;
+            const { id, name } = user;
 
             const tokens = jsonwebtoken.sign({ id }, authConfig.secret, {
                 expiresIn: authConfig.expiresIn,
