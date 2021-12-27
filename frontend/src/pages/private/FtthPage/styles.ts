@@ -14,7 +14,14 @@ export const HorizontalWrapper = styled.div`
   margin: 10px;
 `;
 
-export const FtthTableWrapper = styled.table`
+export const FtthTableWrapper = styled.div`
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  margin: 10px;
+`;
+
+export const FtthTable = styled.table`
   display: flex;
   flex-direction: column;
   align-items: center;

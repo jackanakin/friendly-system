@@ -9,7 +9,8 @@ import { Typography } from '@material-ui/core';
 
 import api from '../../../api/api';
 import {
-    Surface, HorizontalWrapper, FtthTableWrapper, TableTr, TableTh
+    Surface, HorizontalWrapper, FtthTableWrapper,
+    TableTr, TableTh, FtthTable
 } from './styles';
 import AppBackground from '../../../components/AppLayout/AppBackground/AppBackground';
 import Cpe from '../../../@types/models/cpe/Cpe';
@@ -246,47 +247,46 @@ export default function FtthPage() {
                                 </div>
                             </div>
                         </HorizontalWrapper>
-                        <HorizontalWrapper>
-                            <FtthTableWrapper>
-                                <tbody>
-                                    <TableTr>
-                                        <TableTh style={{ width: 10 + "vw" }} id="name" scope="col">Nome</TableTh>
-                                        <TableTh style={{ width: 12 + "vw" }} id="username" scope="col">Username</TableTh>
-                                        <TableTh style={{ width: 6 + "vw" }} id="onu_serial" scope="col">Serial</TableTh>
-                                        <TableTh style={{ width: 8 + "vw" }} id="nap" scope="col" >CTO</TableTh>
-                                        <TableTh style={{ width: 2 + "vw" }} id="nap_port" scope="col" >Porta</TableTh>
-                                        <TableTh style={{ width: 2 + "vw" }} id="last_rx" scope="col" >RX</TableTh>
-                                        <TableTh style={{ width: 2 + "vw" }} id="last_tx" scope="col" >TX</TableTh>
-                                        <TableTh style={{ width: 6 + "vw" }} id="last_software_version" scope="col" >Fw. Version</TableTh>
-                                        <TableTh style={{ width: 6 + "vw" }} id="last_pon_index" scope="col" >PON Index</TableTh>
-                                        <TableTh style={{ width: 6 + "vw" }} id="last_online" scope="col" >Última vista</TableTh>
-                                    </TableTr>
-                                </tbody>
-                                <tbody>
-                                    {
-                                        fetchCpeStatus.status === FetchStatus.IDLE ?
-                                            <Typography variant="subtitle2">
-                                                Selecione um Ponto de Presença e pressione PESQUISAR
-                                            </Typography>
+                        <FtthTableWrapper>
+                            {
+                                fetchCpeStatus.status === FetchStatus.IDLE ?
+                                    <Typography variant="subtitle2">
+                                        Selecione um Ponto de Presença e pressione PESQUISAR
+                                    </Typography>
+                                    : fetchCpeStatus.status === FetchStatus.LOADING ?
+                                        <LoadingComponent />
+                                        :
+                                        fetchCpeStatus.status === FetchStatus.FAILED ?
+                                            <ErrorComponent text={fetchCpeStatus.message} />
                                             :
-                                            fetchCpeStatus.status === FetchStatus.LOADING ?
-                                                <LoadingComponent />
-                                                :
-                                                fetchCpeStatus.status === FetchStatus.FAILED ?
-                                                    <ErrorComponent text={fetchCpeStatus.message} />
-                                                    :
-                                                    cpeList.length > 0 ?
-                                                        cpeList.map((obj, index: number) =>
+                                            cpeList.length > 0 ?
+                                                <FtthTable>
+                                                    <tbody>
+                                                        <TableTr>
+                                                            <TableTh style={{ width: 10 + "vw" }} id="name" scope="col">Nome</TableTh>
+                                                            <TableTh style={{ width: 12 + "vw" }} id="username" scope="col">Username</TableTh>
+                                                            <TableTh style={{ width: 6 + "vw" }} id="onu_serial" scope="col">Serial</TableTh>
+                                                            <TableTh style={{ width: 8 + "vw" }} id="nap" scope="col" >CTO</TableTh>
+                                                            <TableTh style={{ width: 2 + "vw" }} id="nap_port" scope="col" >Porta</TableTh>
+                                                            <TableTh style={{ width: 2 + "vw" }} id="last_rx" scope="col" >RX</TableTh>
+                                                            <TableTh style={{ width: 2 + "vw" }} id="last_tx" scope="col" >TX</TableTh>
+                                                            <TableTh style={{ width: 6 + "vw" }} id="last_software_version" scope="col" >Fw. Version</TableTh>
+                                                            <TableTh style={{ width: 6 + "vw" }} id="last_pon_index" scope="col" >PON Index</TableTh>
+                                                            <TableTh style={{ width: 6 + "vw" }} id="last_online" scope="col" >Última vista</TableTh>
+                                                        </TableTr>
+                                                    </tbody>
+                                                    <tbody>
+                                                        {cpeList.map((obj, index: number) =>
                                                             <FtthCpeRow key={obj.erp_cpe_id} obj={obj} />
-                                                        )
-                                                        :
-                                                        <Typography variant="subtitle2">
-                                                            Nenhum resultado retornado
-                                                        </Typography>
-                                    }
-                                </tbody>
-                            </FtthTableWrapper>
-                        </HorizontalWrapper>
+                                                        )}
+                                                    </tbody>
+                                                </FtthTable>
+                                                :
+                                                <Typography variant="subtitle2">
+                                                    Nenhum resultado retornado
+                                                </Typography>
+                            }
+                        </FtthTableWrapper>
                     </Surface>
             }
         </AppBackground>
