@@ -26,14 +26,16 @@ import { LoadingComponent } from '../../../components/LoadingComponent/LoadingCo
 import { ErrorComponent } from '../../../components/ErrorComponent/ErrorComponent';
 
 export default function FtthPage() {
-    const [fetchApStatus, setFetchApStatus] = useState<AxiosFetch>(FetchRunning);
-    const [selectedAp, setSelectedAp] = useState<Ap | string>("");
+    const [selectedAp, setSelectedAp] = useState<number>(-1);
     const [selectedCto, setSelectedCto] = useState<string>("");
+
+    const [fetchApStatus, setFetchApStatus] = useState<AxiosFetch>(FetchRunning);
     const [apList, setApList] = useState<Ap[]>([]);
 
     const [fetchCpeStatus, setFetchCpeStatus] = useState<AxiosFetch>(FetchIdle);
     const [cpeList, setCpeList] = useState<Cpe[]>([]);
     const [cpeListCached, setCpeListCached] = useState<Cpe[]>([]);
+
     const [ctoList, setCtoList] = useState<string[]>([]);
 
     useEffect(() => {
@@ -70,11 +72,11 @@ export default function FtthPage() {
     }
 
     async function fetchCpeList() {
-        if (!selectedAp || typeof (selectedAp) === "string") return;
+        if (selectedAp <= 0) return;
         setFetchCpeStatus(FetchRunning);
 
         try {
-            const { data }: { data: Cpe[] } = await api.get('cpe/' + selectedAp.id);
+            const { data }: { data: Cpe[] } = await api.get('cpe/' + selectedAp);
             const ctoList = [] as string[];
 
             data.forEach(function (obj) {
@@ -179,11 +181,11 @@ export default function FtthPage() {
                                 <FormControl fullWidth>
                                     {selectedAp ? null : <InputLabel htmlFor="selectedPop">Ponto de Presença</InputLabel>}
                                     <Select MenuProps={{ PaperProps: { sx: { maxHeight: '25vh' } } }} name="selectedPop" value={selectedAp} onChange={handleApChange}>
-                                        <MenuItem value="" selected>SELECIONE ...</MenuItem>
+                                        <MenuItem value={-1} selected>SELECIONE ...</MenuItem>
                                         {
                                             apList.length > 0 ?
-                                                apList.map((obj: any, index: number) =>
-                                                    <MenuItem key={index} value={obj}>{obj.description}</MenuItem>
+                                                apList.map((obj: Ap, index: number) =>
+                                                    <MenuItem key={index} value={obj.id}>{obj.description}</MenuItem>
                                                 )
                                                 :
                                                 null
@@ -203,7 +205,7 @@ export default function FtthPage() {
                                         <MenuItem value={""} selected>TODAS ...</MenuItem>
                                         {
                                             ctoList.length > 0 ?
-                                                ctoList.map((obj: any) =>
+                                                ctoList.map((obj: string) =>
                                                     <MenuItem key={obj} value={obj}>{obj}</MenuItem>
                                                 )
                                                 :
@@ -263,16 +265,16 @@ export default function FtthPage() {
                                                 <FtthTable>
                                                     <tbody>
                                                         <TableTr>
-                                                            <TableTh style={{ width: 10 + "vw" }} id="name" scope="col">Nome</TableTh>
-                                                            <TableTh style={{ width: 12 + "vw" }} id="username" scope="col">Username</TableTh>
-                                                            <TableTh style={{ width: 6 + "vw" }} id="onu_serial" scope="col">Serial</TableTh>
-                                                            <TableTh style={{ width: 8 + "vw" }} id="nap" scope="col" >CTO</TableTh>
-                                                            <TableTh style={{ width: 2 + "vw" }} id="nap_port" scope="col" >Porta</TableTh>
-                                                            <TableTh style={{ width: 2 + "vw" }} id="last_rx" scope="col" >RX</TableTh>
-                                                            <TableTh style={{ width: 2 + "vw" }} id="last_tx" scope="col" >TX</TableTh>
-                                                            <TableTh style={{ width: 6 + "vw" }} id="last_software_version" scope="col" >Fw. Version</TableTh>
-                                                            <TableTh style={{ width: 6 + "vw" }} id="last_pon_index" scope="col" >PON Index</TableTh>
-                                                            <TableTh style={{ width: 6 + "vw" }} id="last_online" scope="col" >Última vista</TableTh>
+                                                            <TableTh id="name" scope="col">Nome</TableTh>
+                                                            <TableTh id="username" scope="col">Username</TableTh>
+                                                            <TableTh id="onu_serial" scope="col">Serial</TableTh>
+                                                            <TableTh id="nap" scope="col" >CTO</TableTh>
+                                                            <TableTh id="nap_port" scope="col" >Porta</TableTh>
+                                                            <TableTh id="last_rx" scope="col" >RX</TableTh>
+                                                            <TableTh id="last_tx" scope="col" >TX</TableTh>
+                                                            <TableTh id="last_software_version" scope="col" >Fw. Version</TableTh>
+                                                            <TableTh id="last_pon_index" scope="col" >PON Index</TableTh>
+                                                            <TableTh id="last_online" scope="col" >Última vista</TableTh>
                                                         </TableTr>
                                                     </tbody>
                                                     <tbody>

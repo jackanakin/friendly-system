@@ -96,16 +96,16 @@ const FtthCpeRow: React.FC<FtthCpeRowProps> = ({ obj }) => {
 
     return (
         <TableTr style={{ backgroundColor: !obj.online ? '#d67d78' : '#6bd17c' }}>
-            <TableTd style={{ width: 10 + "vw" }} onClick={() => triggerExpandRow()}><ArrowDropDownCircle />{"  "}{obj.name}</TableTd>
-            <TableTd style={{ width: 12 + "vw" }}>{obj.username}</TableTd>
-            <TableTd style={{ width: 6 + "vw" }}>{obj.onu_serial}</TableTd>
-            <TableTd style={{ width: 8 + "vw" }}>{obj.nap}</TableTd>
-            <TableTd style={{ width: 2 + "vw" }}>{obj.nap_port}</TableTd>
-            <TableTd style={{ width: 2 + "vw" }}>{obj.last_rx}</TableTd>
-            <TableTd style={{ width: 2 + "vw" }}>{obj.last_tx}</TableTd>
-            <TableTd style={{ width: 6 + "vw" }}>{obj.last_software_version}</TableTd>
-            <TableTd style={{ width: 6 + "vw" }}>{obj.last_pon_index}</TableTd>
-            <TableTd style={{ width: 6 + "vw" }}>{obj.last_online ? format(parseISO(obj.last_online), "dd/MM HH:mm") : 'Nunca'}</TableTd>
+            <TableTd onClick={() => triggerExpandRow()}><ArrowDropDownCircle />{"  "}{obj.name}</TableTd>
+            <TableTd>{obj.username}</TableTd>
+            <TableTd>{obj.onu_serial}</TableTd>
+            <TableTd>{obj.nap}</TableTd>
+            <TableTd>{obj.nap_port}</TableTd>
+            <TableTd>{obj.last_rx}</TableTd>
+            <TableTd>{obj.last_tx}</TableTd>
+            <TableTd>{obj.last_software_version}</TableTd>
+            <TableTd>{obj.last_pon_index}</TableTd>
+            <TableTd>{obj.last_online ? format(parseISO(obj.last_online), "dd/MM HH:mm") : 'Nunca'}</TableTd>
             <TableTdExtra style={{ display: expandRow ? '' : 'none' }}>
                 <div style={{ flexDirection: 'row' }}>
                     <ExtraTdContainer>
