@@ -5,6 +5,7 @@ import Select from '@material-ui/core/Select';
 import MenuItem from '@material-ui/core/MenuItem';
 import InputLabel from '@material-ui/core/InputLabel';
 import TextField from '@material-ui/core/TextField';
+import { Typography } from '@material-ui/core';
 
 import api from '../../../api/api';
 import {
@@ -20,7 +21,6 @@ import AxiosFetch from '../../../@types/api/AxiosFetch';
 import { FetchStatus } from '../../../@enum/api/FetchStatus';
 import { LoadingPage } from '../../../components/LoadingPage/LoadingPage';
 import { ErrorPage } from '../../../components/ErrorPage/ErrorPage';
-import { Typography } from '@material-ui/core';
 import { LoadingComponent } from '../../../components/LoadingComponent/LoadingComponent';
 import { ErrorComponent } from '../../../components/ErrorComponent/ErrorComponent';
 
@@ -177,7 +177,7 @@ export default function FtthPage() {
                             <div style={{ width: 50 + '%', padding: 10 + 'px' }}>
                                 <FormControl fullWidth>
                                     {selectedAp ? null : <InputLabel htmlFor="selectedPop">Ponto de Presença</InputLabel>}
-                                    <Select name="selectedPop" value={selectedAp} onChange={handleApChange}>
+                                    <Select MenuProps={{ PaperProps: { sx: { maxHeight: '25vh' } } }} name="selectedPop" value={selectedAp} onChange={handleApChange}>
                                         <MenuItem value="" selected>SELECIONE ...</MenuItem>
                                         {
                                             apList.length > 0 ?
@@ -198,7 +198,7 @@ export default function FtthPage() {
                             <div style={{ width: 50 + '%', padding: 10 + 'px' }}>
                                 <FormControl fullWidth>
                                     {selectedCto ? null : <InputLabel htmlFor="selectedCto">CTO</InputLabel>}
-                                    <Select name="selectedCto" value={selectedCto} onChange={handleCtoChange}>
+                                    <Select MenuProps={{ PaperProps: { sx: { maxHeight: '25vh' } } }} name="selectedCto" value={selectedCto} onChange={handleCtoChange}>
                                         <MenuItem value={""} selected>TODAS ...</MenuItem>
                                         {
                                             ctoList.length > 0 ?

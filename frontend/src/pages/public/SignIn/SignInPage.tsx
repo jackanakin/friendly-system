@@ -1,11 +1,14 @@
-import React from "react";
+import { CircularProgress } from "@material-ui/core";
+import React, { useState } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
 import * as Yup from "yup";
+
+import { FetchIdle, FetchRunning } from "../../../@dto/api/FetchStatus";
+import { FetchStatus } from "../../../@enum/api/FetchStatus";
+import AxiosFetch from "../../../@types/api/AxiosFetch";
 import { useAuth } from "../../../providers/auth/AuthProvider";
-
-
+import { axiosErrorHandler } from "../../../utils/ErrorHandler/axiosErrorHandler";
 import { Wrapper, Content } from "./styles";
-//import logo from "assets/imgs/logo.png";
 
 const schema = Yup.object().shape({
     email: Yup.string()
@@ -21,16 +24,13 @@ export default function SignInPage() {
     const navigate = useNavigate();
     const location = useLocation();
 
-    const [loading, setLoading] = React.useState<boolean>(false);
-    const [error, setError] = React.useState<string | null>(null);
+    const [fetchLoginStatus, setFetchLoginStatus] = useState<AxiosFetch>(FetchIdle);
 
     async function handleSubmit(event: React.FormEvent<HTMLFormElement>) {
         event.preventDefault();
+        setFetchLoginStatus(FetchRunning);
 
         try {
-            setLoading(true);
-            setError(null);
-
             const data = new FormData(event.target as HTMLFormElement);
             const email = data.get("email") as string;
             const password = data.get("password") as string;
@@ -38,16 +38,21 @@ export default function SignInPage() {
             const isValid = await schema.isValid({ email, password });
 
             if (!isValid) {
-                setError("Falha de autenticação");
+                setFetchLoginStatus({
+                    status: FetchStatus.FAILED,
+                    message: "Falha na autenticação"
+                });
             } else {
                 await signin({ email, password });
                 const from = location.state?.from?.pathname || "/";
                 navigate(from, { replace: true });
             }
-        } catch (err) {
-            console.log(err);
-            setLoading(false);
-            setError("Erro interno");
+        } catch (error) {
+            const handledError = axiosErrorHandler(error);
+            setFetchLoginStatus({
+                status: FetchStatus.FAILED,
+                message: handledError
+            });
         }
     }
 
@@ -71,10 +76,10 @@ export default function SignInPage() {
                     />
 
                     <button type="submit">
-                        {loading ? "Carregando..." : "Acessar"}
+                        {fetchLoginStatus.status === FetchStatus.LOADING ? <CircularProgress /> : "Entrar"}
                     </button>
 
-                    {error && <p>{error}</p>}
+                    {fetchLoginStatus.status === FetchStatus.FAILED && <p>{fetchLoginStatus.message}</p>}
                 </form>
             </Content>
         </Wrapper>
