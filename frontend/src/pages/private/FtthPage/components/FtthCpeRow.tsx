@@ -8,7 +8,8 @@ import api from '../../../../api/api';
 import CpeRecord from '../../../../@types/models/cpe/CpeRecord';
 import { TableTd, TableTdExtra, TableTr } from '../styles';
 import { Button } from '@material-ui/core';
-import { ExtraTdContainer, ExtraTdContainerSeparator, ExtraContainer, CpeRecordContainer } from './FtthCpeRowStyles';
+import { ExtraTdContainer, ExtraTdContainerSeparator, ExtraContainer, CpeRecordContainer } from './styles';
+import { axiosErrorHandler } from '../../../../utils/ErrorHandler/axiosErrorHandler';
 
 interface FtthCpeRowProps {
     obj: Cpe;
@@ -23,7 +24,7 @@ interface SignalNow {
 const FtthCpeRow: React.FC<FtthCpeRowProps> = ({ obj }) => {
     const [fetchSignalNowStatus, setFetchSignalNowStatus] = useState<string | null>(null);
     const [fetchSignalHistoryStatus, setFetchSignalHistoryStatus] = useState<string | null>(null);
-    //const [fetchExtraStatus, setFetchExtraStatus] = useState<string | null>(null);
+    const [fetchExtraStatus, setFetchExtraStatus] = useState<string | null>(null);
 
     const [signalNow, setSignalNow] = useState<SignalNow | null>(null);
     const [cpeRecordSignal, setCpeRecordSignal] = useState<CpeRecord[]>([]);
@@ -49,9 +50,9 @@ const FtthCpeRow: React.FC<FtthCpeRowProps> = ({ obj }) => {
             } else {
                 setFetchSignalHistoryStatus("Sem dados");
             }
-        } catch (err: any) {
-            console.log(err);
-            setFetchSignalHistoryStatus(String(err));
+        } catch (error: any) {
+            const handledError = axiosErrorHandler(error);
+            setFetchSignalHistoryStatus(handledError);
         }
     }
 
@@ -67,9 +68,9 @@ const FtthCpeRow: React.FC<FtthCpeRowProps> = ({ obj }) => {
                 setSignalNow(data);
                 setFetchSignalNowStatus(null);
             }
-        } catch (err: any) {
-            console.log(String(err));
-            setFetchSignalNowStatus(String(err));
+        } catch (error: any) {
+            const handledError = axiosErrorHandler(error);
+            setFetchSignalNowStatus(handledError);
         }
 
         setExpandRow(true);
@@ -81,16 +82,16 @@ const FtthCpeRow: React.FC<FtthCpeRowProps> = ({ obj }) => {
 
     async function triggerExpandExtra() {
         setShowExtra(true);
-        //setFetchExtraStatus("Carregando");
+        setFetchExtraStatus("Carregando");
 
         try {
             const { data }: { data: CpeRecord | null } = await api.get('cpe/details/' + obj.erp_cpe_id);
             setLatestCpeRecord(data);
-        } catch (err: any) {
-            console.log(err);
-            //setFetchExtraStatus(String(err));
+            setFetchExtraStatus(null);
+        } catch (error: any) {
+            const handledError = axiosErrorHandler(error);
+            setFetchExtraStatus(handledError);
         }
-
     }
 
     return (
@@ -160,9 +161,10 @@ const FtthCpeRow: React.FC<FtthCpeRowProps> = ({ obj }) => {
                                     <p>Hw.: {obj.last_hardware_version}</p>
                                     <p>Sw.: {obj.last_software_version}</p>
                                 </CpeRecordContainer>
-                                {latestCpeRecord &&
+                                {fetchExtraStatus ? <p>{fetchExtraStatus}</p> :
+                                    (!fetchExtraStatus && latestCpeRecord) &&
                                     <CpeRecordContainer>
-                                        <h5>Config. da ONU: {format(parseISO(latestCpeRecord.datetime), "dd/MM HH:mm")}</h5>
+                                        <p>Obtidos em: {format(parseISO(latestCpeRecord.datetime), "dd/MM HH:mm")}</p>
                                         <p>ONU em NAT?: {latestCpeRecord.wan_pppoe_username ? "sim" : "não"}</p>
                                         <p>Porta: {latestCpeRecord.port_name}</p>
                                         <p>Speed: {latestCpeRecord.port_speed}</p>

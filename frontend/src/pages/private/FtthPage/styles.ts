@@ -15,6 +15,9 @@ export const HorizontalWrapper = styled.div`
 `;
 
 export const FtthTableWrapper = styled.table`
+  display: flex;
+  flex-direction: column;
+  align-items: center;
   border: none;
   border-top: 1px solid #EEEEEE;
   font-family: arial, sans-serif;

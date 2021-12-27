@@ -14,11 +14,23 @@ import AppBackground from '../../../components/AppLayout/AppBackground/AppBackgr
 import Cpe from '../../../@types/models/cpe/Cpe';
 import FtthCpeRow from './components/FtthCpeRow';
 import Ap from '../../../@types/models/ap/Ap';
+import { axiosErrorHandler } from '../../../utils/ErrorHandler/axiosErrorHandler';
+import { FetchIdle, FetchRunning, FetchSuccessful } from '../../../@dto/api/FetchStatus';
+import AxiosFetch from '../../../@types/api/AxiosFetch';
+import { FetchStatus } from '../../../@enum/api/FetchStatus';
+import { LoadingPage } from '../../../components/LoadingPage/LoadingPage';
+import { ErrorPage } from '../../../components/ErrorPage/ErrorPage';
+import { Typography } from '@material-ui/core';
+import { LoadingComponent } from '../../../components/LoadingComponent/LoadingComponent';
+import { ErrorComponent } from '../../../components/ErrorComponent/ErrorComponent';
 
 export default function FtthPage() {
+    const [fetchApStatus, setFetchApStatus] = useState<AxiosFetch>(FetchRunning);
     const [selectedAp, setSelectedAp] = useState<Ap | string>("");
     const [selectedCto, setSelectedCto] = useState<string>("");
     const [apList, setApList] = useState<Ap[]>([]);
+
+    const [fetchCpeStatus, setFetchCpeStatus] = useState<AxiosFetch>(FetchIdle);
     const [cpeList, setCpeList] = useState<Cpe[]>([]);
     const [cpeListCached, setCpeListCached] = useState<Cpe[]>([]);
     const [ctoList, setCtoList] = useState<string[]>([]);
@@ -29,12 +41,20 @@ export default function FtthPage() {
     }, []);
 
     async function fetchApList() {
-        loadAp();
-    }
+        setFetchApStatus(FetchRunning);
 
-    async function loadAp() {
-        const { data }: { data: Ap[] } = await api.get('ap');
-        setApList(data);
+        try {
+            const { data }: { data: Ap[] } = await api.get('ap');
+
+            setApList(data);
+            setFetchApStatus(FetchSuccessful);
+        } catch (error: any) {
+            const handledError = axiosErrorHandler(error);
+            setFetchApStatus({
+                message: handledError,
+                status: FetchStatus.FAILED
+            });
+        }
     }
 
     function handleApChange(event: any) {
@@ -48,24 +68,35 @@ export default function FtthPage() {
         filterCto(event.target.value)
     }
 
-    async function loadCpes() {
+    async function fetchCpeList() {
         if (!selectedAp || typeof (selectedAp) === "string") return;
+        setFetchCpeStatus(FetchRunning);
 
-        const { data }: { data: Cpe[] } = await api.get('cpe/' + selectedAp.id);
-        const ctoList = [] as string[];
+        try {
+            const { data }: { data: Cpe[] } = await api.get('cpe/' + selectedAp.id);
+            const ctoList = [] as string[];
 
-        data.forEach(function (obj) {
-            if (obj.nap && !ctoList.includes(obj.nap)) {
-                ctoList.push(obj.nap)
-            }
-        });
-        const sorterAlphanumerical = new Intl.Collator(undefined, { numeric: true, sensitivity: 'base' });
-        const sortedCtoList = ctoList.sort(sorterAlphanumerical.compare);
+            data.forEach(function (obj) {
+                if (obj.nap && !ctoList.includes(obj.nap)) {
+                    ctoList.push(obj.nap)
+                }
+            });
+            const sorterAlphanumerical = new Intl.Collator(undefined, { numeric: true, sensitivity: 'base' });
+            const sortedCtoList = ctoList.sort(sorterAlphanumerical.compare);
 
-        //console.log(format(parseISO(String(data[0].last_online)), "dd/MM HH:mm"))
-        setCpeList(data);
-        setCpeListCached(data);
-        setCtoList(sortedCtoList);
+            setCpeList(data);
+            setCpeListCached(data);
+            setCtoList(sortedCtoList);
+
+            setFetchCpeStatus(FetchSuccessful);
+        } catch (error: any) {
+            const handledError = axiosErrorHandler(error);
+            setFetchCpeStatus({
+                message: handledError,
+                status: FetchStatus.FAILED
+            });
+        }
+
     }
 
     function filterCto(cto: string) {
@@ -139,109 +170,125 @@ export default function FtthPage() {
 
     return (
         <AppBackground>
-            <Surface>
-                <HorizontalWrapper>
-                    <div style={{ width: 50 + '%', padding: 10 + 'px' }}>
-                        <FormControl fullWidth>
-                            {selectedAp ? null : <InputLabel htmlFor="selectedPop">Ponto de Presença</InputLabel>}
-                            <Select name="selectedPop" value={selectedAp} onChange={handleApChange}>
-                                <MenuItem value="" selected>SELECIONE ...</MenuItem>
-                                {
-                                    apList.length > 0 ?
-                                        apList.map((obj: any, index: number) =>
-                                            <MenuItem key={index} value={obj}>{obj.description}</MenuItem>
-                                        )
-                                        :
-                                        null
-                                }
-                            </Select>
-                        </FormControl>
-                    </div>
-                    <div>
-                        <Button type="submit" onClick={loadCpes} >PESQUISAR</Button>
-                    </div>
-                </HorizontalWrapper>
-                <HorizontalWrapper>
-                    <div style={{ width: 50 + '%', padding: 10 + 'px' }}>
-                        <FormControl fullWidth>
-                            {selectedCto ? null : <InputLabel htmlFor="selectedCto">CTO</InputLabel>}
-                            <Select name="selectedCto" value={selectedCto} onChange={handleCtoChange}>
-                                <MenuItem value={""} selected>TODAS ...</MenuItem>
-                                {
-                                    ctoList.length > 0 ?
-                                        ctoList.map((obj: any) =>
-                                            <MenuItem key={obj} value={obj}>{obj}</MenuItem>
-                                        )
-                                        :
-                                        null
-                                }
-                            </Select>
-                        </FormControl>
-                    </div>
-                </HorizontalWrapper>
-                <HorizontalWrapper>
-                    <div style={{ padding: 20 + 'px', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-                        <div style={{ width: 90 + '%', padding: 10 + 'px' }}>
-                            <TextField fullWidth
-                                name="name"
-                                label="Filtrar por nome"
-                                id="name"
-                                margin="normal"
-                                variant="outlined"
-                                onChange={handleNameFilter}
-                            />
-                        </div>
-                        <div style={{ width: 90 + '%', padding: 10 + 'px' }}>
-                            <TextField fullWidth
-                                name="username"
-                                label="Filtrar por username"
-                                id="username"
-                                margin="normal"
-                                variant="outlined"
-                                onChange={handleUsernameFilter}
-                            />
-                        </div>
-                        <div style={{ width: 90 + '%', padding: 10 + 'px' }}>
-                            <TextField fullWidth
-                                name="onu_serial"
-                                label="Filtrar por serial"
-                                id="onu_serial"
-                                margin="normal"
-                                variant="outlined"
-                                onChange={handleSerialFilter}
-                            />
-                        </div>
-                    </div>
-                </HorizontalWrapper>
-                <HorizontalWrapper>
-                    <FtthTableWrapper>
-                        <tbody>
-                            <TableTr>
-                                <TableTh style={{ width: 10 + "vw" }} id="name" scope="col">Nome</TableTh>
-                                <TableTh style={{ width: 12 + "vw" }} id="username" scope="col">Username</TableTh>
-                                <TableTh style={{ width: 6 + "vw" }} id="onu_serial" scope="col">Serial</TableTh>
-                                <TableTh style={{ width: 8 + "vw" }} id="nap" scope="col" >CTO</TableTh>
-                                <TableTh style={{ width: 2 + "vw" }} id="nap_port" scope="col" >Porta</TableTh>
-                                <TableTh style={{ width: 2 + "vw" }} id="last_rx" scope="col" >RX</TableTh>
-                                <TableTh style={{ width: 2 + "vw" }} id="last_tx" scope="col" >TX</TableTh>
-                                <TableTh style={{ width: 6 + "vw" }} id="last_software_version" scope="col" >Fw. Version</TableTh>
-                                <TableTh style={{ width: 6 + "vw" }} id="last_pon_index" scope="col" >PON Index</TableTh>
-                                <TableTh style={{ width: 6 + "vw" }} id="last_online" scope="col" >Última vista</TableTh>
-                            </TableTr>
-                        </tbody>
-                        <tbody>
-                            {
-                                cpeList.length > 0 ?
-                                    cpeList.map((obj, index: number) =>
-                                        <FtthCpeRow key={obj.erp_cpe_id} obj={obj} />
-                                    )
-                                    :
-                                    null
-                            }
-                        </tbody>
-                    </FtthTableWrapper>
-                </HorizontalWrapper>
-            </Surface>
+            {fetchApStatus.status === FetchStatus.LOADING ?
+                <LoadingPage /> : fetchApStatus.status === FetchStatus.FAILED ? <ErrorPage callback={fetchApList} /> :
+                    <Surface>
+                        <HorizontalWrapper>
+                            <div style={{ width: 50 + '%', padding: 10 + 'px' }}>
+                                <FormControl fullWidth>
+                                    {selectedAp ? null : <InputLabel htmlFor="selectedPop">Ponto de Presença</InputLabel>}
+                                    <Select name="selectedPop" value={selectedAp} onChange={handleApChange}>
+                                        <MenuItem value="" selected>SELECIONE ...</MenuItem>
+                                        {
+                                            apList.length > 0 ?
+                                                apList.map((obj: any, index: number) =>
+                                                    <MenuItem key={index} value={obj}>{obj.description}</MenuItem>
+                                                )
+                                                :
+                                                null
+                                        }
+                                    </Select>
+                                </FormControl>
+                            </div>
+                            <div>
+                                <Button type="submit" onClick={fetchCpeList} >PESQUISAR</Button>
+                            </div>
+                        </HorizontalWrapper>
+                        <HorizontalWrapper>
+                            <div style={{ width: 50 + '%', padding: 10 + 'px' }}>
+                                <FormControl fullWidth>
+                                    {selectedCto ? null : <InputLabel htmlFor="selectedCto">CTO</InputLabel>}
+                                    <Select name="selectedCto" value={selectedCto} onChange={handleCtoChange}>
+                                        <MenuItem value={""} selected>TODAS ...</MenuItem>
+                                        {
+                                            ctoList.length > 0 ?
+                                                ctoList.map((obj: any) =>
+                                                    <MenuItem key={obj} value={obj}>{obj}</MenuItem>
+                                                )
+                                                :
+                                                null
+                                        }
+                                    </Select>
+                                </FormControl>
+                            </div>
+                        </HorizontalWrapper>
+                        <HorizontalWrapper>
+                            <div style={{ padding: 20 + 'px', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                                <div style={{ width: 90 + '%', padding: 10 + 'px' }}>
+                                    <TextField fullWidth
+                                        name="name"
+                                        label="Filtrar por nome"
+                                        id="name"
+                                        margin="normal"
+                                        variant="outlined"
+                                        onChange={handleNameFilter}
+                                    />
+                                </div>
+                                <div style={{ width: 90 + '%', padding: 10 + 'px' }}>
+                                    <TextField fullWidth
+                                        name="username"
+                                        label="Filtrar por username"
+                                        id="username"
+                                        margin="normal"
+                                        variant="outlined"
+                                        onChange={handleUsernameFilter}
+                                    />
+                                </div>
+                                <div style={{ width: 90 + '%', padding: 10 + 'px' }}>
+                                    <TextField fullWidth
+                                        name="onu_serial"
+                                        label="Filtrar por serial"
+                                        id="onu_serial"
+                                        margin="normal"
+                                        variant="outlined"
+                                        onChange={handleSerialFilter}
+                                    />
+                                </div>
+                            </div>
+                        </HorizontalWrapper>
+                        <HorizontalWrapper>
+                            <FtthTableWrapper>
+                                <tbody>
+                                    <TableTr>
+                                        <TableTh style={{ width: 10 + "vw" }} id="name" scope="col">Nome</TableTh>
+                                        <TableTh style={{ width: 12 + "vw" }} id="username" scope="col">Username</TableTh>
+                                        <TableTh style={{ width: 6 + "vw" }} id="onu_serial" scope="col">Serial</TableTh>
+                                        <TableTh style={{ width: 8 + "vw" }} id="nap" scope="col" >CTO</TableTh>
+                                        <TableTh style={{ width: 2 + "vw" }} id="nap_port" scope="col" >Porta</TableTh>
+                                        <TableTh style={{ width: 2 + "vw" }} id="last_rx" scope="col" >RX</TableTh>
+                                        <TableTh style={{ width: 2 + "vw" }} id="last_tx" scope="col" >TX</TableTh>
+                                        <TableTh style={{ width: 6 + "vw" }} id="last_software_version" scope="col" >Fw. Version</TableTh>
+                                        <TableTh style={{ width: 6 + "vw" }} id="last_pon_index" scope="col" >PON Index</TableTh>
+                                        <TableTh style={{ width: 6 + "vw" }} id="last_online" scope="col" >Última vista</TableTh>
+                                    </TableTr>
+                                </tbody>
+                                <tbody>
+                                    {
+                                        fetchCpeStatus.status === FetchStatus.IDLE ?
+                                            <Typography variant="subtitle2">
+                                                Selecione um Ponto de Presença e pressione PESQUISAR
+                                            </Typography>
+                                            :
+                                            fetchCpeStatus.status === FetchStatus.LOADING ?
+                                                <LoadingComponent />
+                                                :
+                                                fetchCpeStatus.status === FetchStatus.FAILED ?
+                                                    <ErrorComponent text={fetchCpeStatus.message} />
+                                                    :
+                                                    cpeList.length > 0 ?
+                                                        cpeList.map((obj, index: number) =>
+                                                            <FtthCpeRow key={obj.erp_cpe_id} obj={obj} />
+                                                        )
+                                                        :
+                                                        <Typography variant="subtitle2">
+                                                            Nenhum resultado retornado
+                                                        </Typography>
+                                    }
+                                </tbody>
+                            </FtthTableWrapper>
+                        </HorizontalWrapper>
+                    </Surface>
+            }
         </AppBackground>
     );
 }
