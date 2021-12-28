@@ -3,13 +3,17 @@ import { format, parseISO } from "date-fns";
 import { GraphicEqOutlined, EmojiObjects, ArrowDropDownCircle, Details } from '@material-ui/icons';
 import { Button } from '@material-ui/core';
 import { LineChart, Line, CartesianGrid, XAxis, YAxis, Tooltip, Legend } from 'recharts';
+import CircularProgress from '@mui/material/CircularProgress';
 
 import Cpe from '../../../../@types/models/cpe/Cpe';
 import api from '../../../../api/api';
 import CpeRecord from '../../../../@types/models/cpe/CpeRecord';
 import { TableTd, TableTdExtra, TableTr } from '../styles';
-import { ExtraTdContainer, ExtraTdContainerSeparator, ExtraContainer, CpeRecordContainer, TableRowButtonContent } from './styles';
+import { ExtraTdContainer, ExtraTdContainerSeparator, ExtraContainer, OnuDetails, TableRowButtonContent } from './styles';
 import { axiosErrorHandler } from '../../../../utils/ErrorHandler/axiosErrorHandler';
+import AxiosFetch from '../../../../@types/api/AxiosFetch';
+import { FetchIdle, FetchRunning, FetchSuccessful } from '../../../../@dto/api/FetchStatus';
+import { FetchStatus } from '../../../../@enum/api/FetchStatus';
 
 interface FtthCpeRowProps {
     obj: Cpe;
@@ -22,55 +26,64 @@ interface SignalNow {
 }
 
 const FtthCpeRow: React.FC<FtthCpeRowProps> = ({ obj }) => {
-    const [fetchSignalNowStatus, setFetchSignalNowStatus] = useState<string | null>(null);
-    const [fetchSignalHistoryStatus, setFetchSignalHistoryStatus] = useState<string | null>(null);
-    const [fetchExtraStatus, setFetchExtraStatus] = useState<string | null>(null);
+    const [fetchOnuDetailStatus, setFetchOnuDetailStatus] = useState<AxiosFetch>(FetchIdle);
+    const [fetchOnuSignalHistoryStatus, setFetchOnuSignalHistoryStatus] = useState<AxiosFetch>(FetchIdle);
+    const [fetchOnuSignalStatus, setFetchOnuSignalStatus] = useState<AxiosFetch>(FetchIdle);
 
     const [signalNow, setSignalNow] = useState<SignalNow | null>(null);
     const [cpeRecordSignal, setCpeRecordSignal] = useState<CpeRecord[]>([]);
-    const [latestCpeRecord, setLatestCpeRecord] = useState<CpeRecord | null>(null);
+    const [cpeDetails, setCpeDetails] = useState<CpeRecord | null>(null);
 
     const [expandRow, setExpandRow] = useState<boolean>(false);
-    const [showExtra, setShowExtra] = useState<boolean>(false);
 
-    async function fetchCpeSignalRecords() {
-        setFetchSignalHistoryStatus('Carregando');
+    async function fetchCpeSignalHistory() {
+        if (fetchOnuSignalHistoryStatus.status === FetchStatus.LOADING) return;
+        setFetchOnuSignalHistoryStatus(FetchRunning);
 
         try {
             const { data }: { data: CpeRecord[] } = await api.get('cpe/txrx/history/' + obj.erp_cpe_id);
+            if (!data || data.length === 0) {
+                setFetchOnuSignalHistoryStatus({
+                    status: FetchStatus.FAILED,
+                    message: "Nenhum resultado"
+                });
+            }
 
             data.forEach(obj => {
                 obj.date = format(parseISO(obj.datetime), "dd/MM HH:mm")
             });
 
             setCpeRecordSignal(data.reverse());
-
-            if (data.length > 0) {
-                setFetchSignalHistoryStatus(null);
-            } else {
-                setFetchSignalHistoryStatus("Sem dados");
-            }
+            setFetchOnuSignalHistoryStatus(FetchSuccessful);
         } catch (error: any) {
             const handledError = axiosErrorHandler(error);
-            setFetchSignalHistoryStatus(handledError);
+            setFetchOnuSignalHistoryStatus({
+                status: FetchStatus.FAILED,
+                message: handledError
+            });
         }
     }
 
-    async function fetchSignal() {
-        setFetchSignalNowStatus("Carregando");
-        setSignalNow(null);
+    async function fetchCpeSignal() {
+        setFetchOnuSignalStatus(FetchRunning);
 
         try {
             const { data }: { data: SignalNow | any } = await api.get('cpe/txrx/actual/' + obj.erp_cpe_id);
             if (data.error) {
-                setFetchSignalNowStatus(data.error);
+                setFetchOnuSignalStatus({
+                    status: FetchStatus.FAILED,
+                    message: data.error
+                });
             } else {
                 setSignalNow(data);
-                setFetchSignalNowStatus(null);
+                setFetchOnuSignalStatus(FetchRunning);
             }
         } catch (error: any) {
             const handledError = axiosErrorHandler(error);
-            setFetchSignalNowStatus(handledError);
+            setFetchOnuSignalStatus({
+                status: FetchStatus.FAILED,
+                message: handledError
+            });
         }
 
         setExpandRow(true);
@@ -81,22 +94,33 @@ const FtthCpeRow: React.FC<FtthCpeRowProps> = ({ obj }) => {
     }
 
     async function triggerExpandExtra() {
-        setShowExtra(true);
-        setFetchExtraStatus("Carregando");
+        if (fetchOnuDetailStatus.status === FetchStatus.LOADING) return;
+        setFetchOnuDetailStatus(FetchRunning);
 
         try {
             const { data }: { data: CpeRecord | null } = await api.get('cpe/details/' + obj.erp_cpe_id);
-            setLatestCpeRecord(data);
-            setFetchExtraStatus(null);
+            setCpeDetails(data);
+
+            if (!data) {
+                setFetchOnuDetailStatus({
+                    status: FetchStatus.FAILED,
+                    message: "Nenhum resultado"
+                });
+            } else {
+                setFetchOnuDetailStatus(FetchSuccessful);
+            }
         } catch (error: any) {
             const handledError = axiosErrorHandler(error);
-            setFetchExtraStatus(handledError);
+            setFetchOnuDetailStatus({
+                status: FetchStatus.FAILED,
+                message: handledError
+            });
         }
     }
 
     return (
         <TableTr style={{ backgroundColor: !obj.online ? '#d67d78' : '#6bd17c' }}>
-            <TableTd onClick={() => triggerExpandRow()}><ArrowDropDownCircle />{"  "}{obj.name}</TableTd>
+            <TableTd onClick={triggerExpandRow}><ArrowDropDownCircle />{"  "}{obj.name}</TableTd>
             <TableTd>{obj.username}</TableTd>
             <TableTd>{obj.onu_serial}</TableTd>
             <TableTd>{obj.nap}</TableTd>
@@ -108,7 +132,7 @@ const FtthCpeRow: React.FC<FtthCpeRowProps> = ({ obj }) => {
             <TableTd>{obj.last_online ? format(parseISO(obj.last_online), "dd/MM HH:mm") : 'Nunca'}</TableTd>
             <TableTdExtra style={{ display: expandRow ? '' : 'none' }}>
                 <ExtraTdContainer>
-                    <Button onClick={() => fetchSignal()} variant="contained">
+                    <Button onClick={fetchCpeSignal} variant="contained">
                         <TableRowButtonContent>
                             Ler sinal agora
                             <EmojiObjects />
@@ -116,72 +140,73 @@ const FtthCpeRow: React.FC<FtthCpeRowProps> = ({ obj }) => {
                     </Button>
                     <ExtraContainer>
                         {
-                            (fetchSignalNowStatus) ? <p>{fetchSignalNowStatus}</p> :
-                                (signalNow &&
+                            fetchOnuSignalStatus.status === FetchStatus.FAILED ? <p>{fetchOnuSignalStatus.message}</p> :
+                                fetchOnuSignalStatus.status === FetchStatus.LOADING ? <CircularProgress /> :
+                                    (fetchOnuSignalHistoryStatus.status === FetchStatus.SUCESS && signalNow) &&
                                     <div>
                                         <p>{format(signalNow.date, "dd/MM HH:mm")}</p>
                                         <p>Rx: {signalNow.rx}db</p>
                                         <p>Tx: {signalNow.tx}db</p>
                                     </div>
-                                )
                         }
                     </ExtraContainer>
                 </ExtraTdContainer>
                 <ExtraTdContainerSeparator />
 
                 <ExtraTdContainer>
-                    <Button onClick={() => fetchCpeSignalRecords()} variant="contained">
+                    <Button onClick={fetchCpeSignalHistory} variant="contained">
                         <TableRowButtonContent>
                             Histórico de sinal
                             <GraphicEqOutlined />
                         </TableRowButtonContent>
                     </Button>
-                    {fetchSignalHistoryStatus ? fetchSignalHistoryStatus : cpeRecordSignal.length > 0 &&
-                        <ExtraContainer>
-                            <LineChart width={800} height={200} data={cpeRecordSignal}>
-                                <Tooltip />
-                                <XAxis dataKey="date" />
-                                <YAxis type="number" />
-                                <Line type="monotone" dataKey="rx" stroke="#FF0000" textAnchor="Rx" />
-                                <Line type="monotone" dataKey="tx" stroke="#0000ff" textAnchor="Tx" />
-                                <Legend />
-                                <CartesianGrid stroke="#ccc" />
-                            </LineChart>
-                        </ExtraContainer>
-                    }
+                    <ExtraContainer>
+                        {fetchOnuSignalHistoryStatus.status === FetchStatus.FAILED ? <p>{fetchOnuSignalHistoryStatus.message}</p> :
+                            fetchOnuSignalHistoryStatus.status === FetchStatus.LOADING ? <CircularProgress /> :
+                                fetchOnuSignalHistoryStatus.status === FetchStatus.SUCESS &&
+                                <LineChart width={800} height={200} data={cpeRecordSignal}>
+                                    <Tooltip />
+                                    <XAxis dataKey="date" />
+                                    <YAxis type="number" />
+                                    <Line type="monotone" dataKey="rx" stroke="#FF0000" textAnchor="Rx" />
+                                    <Line type="monotone" dataKey="tx" stroke="#0000ff" textAnchor="Tx" />
+                                    <Legend />
+                                    <CartesianGrid stroke="#ccc" />
+                                </LineChart>
+                        }
+                    </ExtraContainer>
                 </ExtraTdContainer>
                 <ExtraTdContainerSeparator />
 
                 <ExtraTdContainer>
-                    <Button onClick={() => triggerExpandExtra()} variant="contained">
+                    <Button onClick={triggerExpandExtra} variant="contained">
                         <TableRowButtonContent>
                             Detalhes da ONU
                             <Details />
                         </TableRowButtonContent>
                     </Button>
                     {
-                        showExtra &&
-                        <ExtraContainer>
-                            <CpeRecordContainer>
-                                <p>Cadastrado: {obj.cadastrado}</p>
-                                <p>MAC no MK: {obj.mac_address}</p>
-                                <p>Pos. na PON: {obj.last_pon_index}</p>
-                                <p>Hw.: {obj.last_hardware_version}</p>
-                                <p>Sw.: {obj.last_software_version}</p>
-                            </CpeRecordContainer>
-                            {fetchExtraStatus ? <p>{fetchExtraStatus}</p> :
-                                (!fetchExtraStatus && latestCpeRecord) &&
-                                <CpeRecordContainer>
-                                    <p>Obtidos em: {format(parseISO(latestCpeRecord.datetime), "dd/MM HH:mm")}</p>
-                                    <p>ONU em NAT?: {latestCpeRecord.wan_pppoe_username ? "sim" : "não"}</p>
-                                    <p>Porta: {latestCpeRecord.port_name}</p>
-                                    <p>Speed: {latestCpeRecord.port_speed}</p>
-                                    <p>VLAN: {latestCpeRecord.port_vlan}</p>
-                                    <p>ARP ONU: {latestCpeRecord.port_mac}</p>
-                                    <p>Telefone na ONU: {latestCpeRecord.tel_num}</p>
-                                </CpeRecordContainer>
-                            }
-                        </ExtraContainer>
+                        fetchOnuDetailStatus.status === FetchStatus.FAILED ? <ExtraContainer><p>{fetchOnuDetailStatus.message}</p></ExtraContainer> :
+                            fetchOnuDetailStatus.status === FetchStatus.LOADING ? <ExtraContainer><CircularProgress /></ExtraContainer> :
+                                (fetchOnuDetailStatus.status === FetchStatus.SUCESS && cpeDetails) &&
+                                <ExtraContainer>
+                                    <div>
+                                        <p>Cadastrado: {obj.cadastrado}</p>
+                                        <p>MAC no MK: {obj.mac_address}</p>
+                                        <p>Pos. na PON: {obj.last_pon_index}</p>
+                                        <p>Hw.: {obj.last_hardware_version}</p>
+                                        <p>Sw.: {obj.last_software_version}</p>
+                                    </div>
+                                    <OnuDetails>
+                                        <p>Obtidos em: {format(parseISO(cpeDetails.datetime), "dd/MM HH:mm")}</p>
+                                        <p>ONU em NAT?: {cpeDetails.wan_pppoe_username ? " sim" : " não"}</p>
+                                        <p>Porta: {cpeDetails.port_name}</p>
+                                        <p>Speed: {cpeDetails.port_speed}</p>
+                                        <p>VLAN: {cpeDetails.port_vlan}</p>
+                                        <p>ARP ONU: {cpeDetails.port_mac}</p>
+                                        <p>Telefone na ONU: {cpeDetails.tel_num}</p>
+                                    </OnuDetails>
+                                </ExtraContainer>
                     }
                 </ExtraTdContainer>
             </TableTdExtra>

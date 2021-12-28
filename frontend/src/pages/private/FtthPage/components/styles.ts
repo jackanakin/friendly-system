@@ -1,13 +1,13 @@
 import styled from 'styled-components';
 
-export const CpeRecordContainer = styled.div`
-    margin-left: 2vw;
+export const OnuDetails = styled.div`
+    margin-left: 3vw;
 `;
 
 export const ExtraContainer = styled.div`
     display: flex;
     flex-direction: row;
-    align-items: center;
+    align-items: flex-start;
     margin-left: 1vw;
 `;
 
