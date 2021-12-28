@@ -1,19 +1,24 @@
-import { useState, useEffect } from 'react';
+import React, { useState, useEffect } from 'react';
 import Button from '@material-ui/core/Button';
 import FormControl from '@material-ui/core/FormControl';
 import Select from '@material-ui/core/Select';
 import MenuItem from '@material-ui/core/MenuItem';
 import InputLabel from '@material-ui/core/InputLabel';
 import TextField from '@material-ui/core/TextField';
-import { Typography } from '@material-ui/core';
+import Table from '@mui/material/Table';
+import TableBody from '@mui/material/TableBody';
+import TableCell from '@mui/material/TableCell';
+import TableContainer from '@mui/material/TableContainer';
+import TableHead from '@mui/material/TableHead';
+import Typography from '@mui/material/Typography';
+import Paper from '@mui/material/Paper';
 
 import {
-    Surface, HorizontalWrapper, FtthTableWrapper,
-    TableTr, TableTh, FtthTable
+    Surface, HorizontalWrapper, FtthTableWrapper, TableRowHeader
 } from './styles';
 import AppBackground from '../../../components/AppLayout/AppBackground/AppBackground';
 import Cpe from '../../../@types/models/cpe/Cpe';
-import FtthCpeRow from './components/FtthCpeRow';
+import FtthRow from './components/FtthRow';
 import Ap from '../../../@types/models/ap/Ap';
 import { FetchStatus } from '../../../@enum/api/FetchStatus';
 import { LoadingPage } from '../../../components/LoadingPage/LoadingPage';
@@ -171,7 +176,7 @@ export default function FtthPage() {
                                 <div style={{ width: 90 + '%', padding: 10 + 'px' }}>
                                     <TextField fullWidth
                                         name="name"
-                                        label="Filtrar por nome"
+                                        label="Nome"
                                         id="name"
                                         margin="normal"
                                         variant="outlined"
@@ -181,7 +186,7 @@ export default function FtthPage() {
                                 <div style={{ width: 90 + '%', padding: 10 + 'px' }}>
                                     <TextField fullWidth
                                         name="username"
-                                        label="Filtrar por username"
+                                        label="Username"
                                         id="username"
                                         margin="normal"
                                         variant="outlined"
@@ -191,7 +196,7 @@ export default function FtthPage() {
                                 <div style={{ width: 90 + '%', padding: 10 + 'px' }}>
                                     <TextField fullWidth
                                         name="onu_serial"
-                                        label="Filtrar por serial"
+                                        label="Serial"
                                         id="onu_serial"
                                         margin="normal"
                                         variant="outlined"
@@ -213,27 +218,28 @@ export default function FtthPage() {
                                             <ErrorComponent text={fetchCpeStatus.message} />
                                             :
                                             cpeList.length > 0 ?
-                                                <FtthTable>
-                                                    <tbody>
-                                                        <TableTr>
-                                                            <TableTh id="name" scope="col">Nome</TableTh>
-                                                            <TableTh id="username" scope="col">Username</TableTh>
-                                                            <TableTh id="onu_serial" scope="col">Serial</TableTh>
-                                                            <TableTh id="nap" scope="col" >CTO</TableTh>
-                                                            <TableTh id="nap_port" scope="col" >Porta</TableTh>
-                                                            <TableTh id="last_rx" scope="col" >RX</TableTh>
-                                                            <TableTh id="last_tx" scope="col" >TX</TableTh>
-                                                            <TableTh id="last_software_version" scope="col" >Fw. Version</TableTh>
-                                                            <TableTh id="last_pon_index" scope="col" >PON Index</TableTh>
-                                                            <TableTh id="last_online" scope="col" >Última vista</TableTh>
-                                                        </TableTr>
-                                                    </tbody>
-                                                    <tbody>
-                                                        {cpeList.map((obj, index: number) =>
-                                                            <FtthCpeRow key={obj.erp_cpe_id} obj={obj} />
-                                                        )}
-                                                    </tbody>
-                                                </FtthTable>
+                                                <TableContainer component={Paper}>
+                                                    <Table aria-label="collapsible table">
+                                                        <TableHead>
+                                                            <TableRowHeader>
+                                                                <TableCell align="left" />
+                                                                <TableCell id="name" align="left">Nome</TableCell>
+                                                                <TableCell id="username" align="left">Username</TableCell>
+                                                                <TableCell id="onu_serial" align="left">Serial</TableCell>
+                                                                <TableCell id="nap" align="left" >CTO/Porta</TableCell>
+                                                                <TableCell id="last_rx" align="left" >RX/TX</TableCell>
+                                                                <TableCell id="last_software_version" align="left" >Fw. Version</TableCell>
+                                                                <TableCell id="last_pon_index" align="left" >PON Index</TableCell>
+                                                                <TableCell id="last_online" align="left" >Última vista</TableCell>
+                                                            </TableRowHeader>
+                                                        </TableHead>
+                                                        <TableBody>
+                                                            {cpeList.map((obj, index) => (
+                                                                <FtthRow key={index} obj={obj} />
+                                                            ))}
+                                                        </TableBody>
+                                                    </Table>
+                                                </TableContainer>
                                                 :
                                                 <Typography variant="subtitle2">
                                                     Nenhum resultado retornado
