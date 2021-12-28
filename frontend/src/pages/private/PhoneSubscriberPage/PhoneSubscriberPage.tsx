@@ -1,12 +1,12 @@
-import { useState, useEffect } from 'react';
-import { Typography } from '@material-ui/core';
+import { useState, useEffect, Fragment } from 'react';
+import { Table, TableBody, TableCell, TableHead, TableRow, Typography } from '@material-ui/core';
+import { format, parseISO } from "date-fns";
 
 import api from '../../../api/api';
 import {
-    Surface, HorizontalWrapper, TableWrapper, TableTr, TableTh, Table
+    Surface, HorizontalWrapper, TableWrapper
 } from './styles';
 import AppBackground from '../../../components/AppLayout/AppBackground/AppBackground';
-import PhoneSubscriberRow from './components/PhoneSubscriberRow';
 import CpeWithLatestCpeRecordDTO from '../../../@types/services/phone_subscriber/CpeWithLatestCpeRecordDTO';
 import PhoneSubscriberInconsistenceDTO from '../../../@types/services/phone_subscriber/PhoneSubscriberInconsistenceDTO';
 import AxiosFetch from '../../../@types/api/AxiosFetch';
@@ -36,6 +36,39 @@ export default function PhoneSubscriberPage() {
     async function fetchPhoneSubscriber() {
         setPhoneSubscribers([]);
         const { data }: { data: CpeWithLatestCpeRecordDTO[] } = await api.get('phone_subscriber');
+        data.forEach(obj => {
+            console.log("dicoverSipDevice")
+            //check if is registered on the ONU FXS
+            if (obj.pots_enable && obj.phone_number === obj.tel_num) {
+                obj.sipDiscovery = `ONU/${obj.tel_num}@${obj.signal_vlan}/${obj.software_version}`;
+                return;
+            }
+
+            //check if voice VLAN is used
+            if (obj.port_vlan && obj.port_vlan.indexOf(obj.ap_voice_vlan)) {
+                let voice_vlan_in_lan_port_index = -1;
+
+                const portVlans: string[] = obj.port_vlan.includes('#') ? obj.port_vlan.split('#') : [obj.port_vlan];
+                portVlans.forEach((vlans, index) => {
+                    if (vlans.includes(obj.ap_voice_vlan)) {
+                        voice_vlan_in_lan_port_index = index;
+                    }
+                })
+
+                if (voice_vlan_in_lan_port_index >= 0) {
+                    obj.sipDiscovery = `LAN_${voice_vlan_in_lan_port_index + 1}: VOZ ${portVlans[voice_vlan_in_lan_port_index]}`;
+                    return;
+                }
+            }
+
+            //check if it's behind NAT
+            if (obj.observation && obj.observation.includes('#SIP_NAT#')) {
+                obj.sipDiscovery = `VOZ EM NAT`;
+                return;
+            }
+
+            obj.sipDiscovery = '!! Desconhecido !!';
+        });
         setPhoneSubscribers(data);
     }
 
@@ -73,26 +106,44 @@ export default function PhoneSubscriberPage() {
                         </HorizontalWrapper>
                         <TableWrapper>
                             <Table>
-                                <tbody>
-                                    <TableTr>
-                                        <TableTh id="name" scope="col">Assinante</TableTh>
-                                        <TableTh id="phone_number" scope="col">Número</TableTh>
-                                        <TableTh id="sip_device" scope="col">Disp. SIP</TableTh>
-                                        <TableTh id="ap_name" scope="col">POP</TableTh>
-                                        <TableTh id="last_online" scope="col" >Última vista (ONU)</TableTh>
-                                        <TableTh id="obs" scope="col" >Obs.</TableTh>
-                                    </TableTr>
-                                </tbody>
-                                <tbody>
-                                    {
-                                        phoneSubscribers.map((ps, index) =>
-                                            <PhoneSubscriberRow key={index} obj={ps} />
-                                        )
-                                    }
-                                </tbody>
+                                <TableHead>
+                                    <TableRow>
+                                        <TableCell id="name" align="left">Assinante</TableCell>
+                                        <TableCell id="phone_number" align="left">Número</TableCell>
+                                        <TableCell id="sip_device" align="left">Disp. SIP</TableCell>
+                                        <TableCell id="ap_name" align="left">POP</TableCell>
+                                        <TableCell id="last_online" align="left" >Última vista (ONU)</TableCell>
+                                        <TableCell id="obs" align="left" >Obs.</TableCell>
+                                    </TableRow>
+                                </TableHead>
+
+                                <TableBody>
+                                    {phoneSubscribers.map((obj, index) => (
+                                        <PhoneSubscriberRow key={index} obj={obj} />
+                                    ))}
+                                </TableBody>
                             </Table>
                         </TableWrapper>
                     </Surface>}
         </AppBackground>
+    );
+}
+
+interface PhoneSubscriberRowProps {
+    obj: CpeWithLatestCpeRecordDTO;
+}
+
+function PhoneSubscriberRow({ obj }: PhoneSubscriberRowProps) {
+    return (
+        <Fragment>
+            <TableRow>
+                <TableCell align="left">{obj.erp_contract_id} - {obj.subscriber_name}</TableCell>
+                <TableCell align="left">{obj.phone_number}</TableCell>
+                <TableCell align="left">{obj.sipDiscovery}</TableCell>
+                <TableCell align="left">{obj.ap_name}</TableCell>
+                <TableCell align="left">{obj.last_online ? format(parseISO(obj.last_online), "dd/MM HH:mm") : 'Nunca'}</TableCell>
+                <TableCell align="left">{obj.observation}</TableCell>
+            </TableRow>
+        </Fragment>
     );
 }

@@ -7,4 +7,5 @@ export default interface CpeWithLatestCpeRecordDTO extends Cpe, CpeRecord, Phone
     ap_data_vlan: string;
     ap_name: string;
     subscriber_name: string;
+    sipDiscovery?: string;
 }
