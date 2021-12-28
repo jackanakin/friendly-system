@@ -7,7 +7,6 @@ import InputLabel from '@material-ui/core/InputLabel';
 import TextField from '@material-ui/core/TextField';
 import { Typography } from '@material-ui/core';
 
-import api from '../../../api/api';
 import {
     Surface, HorizontalWrapper, FtthTableWrapper,
     TableTr, TableTh, FtthTable
@@ -16,49 +15,28 @@ import AppBackground from '../../../components/AppLayout/AppBackground/AppBackgr
 import Cpe from '../../../@types/models/cpe/Cpe';
 import FtthCpeRow from './components/FtthCpeRow';
 import Ap from '../../../@types/models/ap/Ap';
-import { axiosErrorHandler } from '../../../utils/ErrorHandler/axiosErrorHandler';
-import { FetchIdle, FetchRunning, FetchSuccessful } from '../../../@dto/api/FetchStatus';
-import AxiosFetch from '../../../@types/api/AxiosFetch';
 import { FetchStatus } from '../../../@enum/api/FetchStatus';
 import { LoadingPage } from '../../../components/LoadingPage/LoadingPage';
 import { ErrorPage } from '../../../components/ErrorPage/ErrorPage';
 import { LoadingComponent } from '../../../components/LoadingComponent/LoadingComponent';
 import { ErrorComponent } from '../../../components/ErrorComponent/ErrorComponent';
+import { useFtth } from '../../../providers/ftth/FtthProvider';
 
 export default function FtthPage() {
     const [selectedAp, setSelectedAp] = useState<number>(-1);
     const [selectedCto, setSelectedCto] = useState<string>("");
 
-    const [fetchApStatus, setFetchApStatus] = useState<AxiosFetch>(FetchRunning);
-    const [apList, setApList] = useState<Ap[]>([]);
-
-    const [fetchCpeStatus, setFetchCpeStatus] = useState<AxiosFetch>(FetchIdle);
-    const [cpeList, setCpeList] = useState<Cpe[]>([]);
-    const [cpeListCached, setCpeListCached] = useState<Cpe[]>([]);
-
-    const [ctoList, setCtoList] = useState<string[]>([]);
+    const {
+        fetchApStatus, fetchCpeStatus,
+        fetchApList, apList,
+        fetchCpeList, cpeList, cpeListCached, ctoList, filterCpeList
+    } = useFtth();
 
     useEffect(() => {
         fetchApList();
         // eslint-disable-next-line react-hooks/exhaustive-deps
     }, []);
 
-    async function fetchApList() {
-        setFetchApStatus(FetchRunning);
-
-        try {
-            const { data }: { data: Ap[] } = await api.get('ap');
-
-            setApList(data);
-            setFetchApStatus(FetchSuccessful);
-        } catch (error: any) {
-            const handledError = axiosErrorHandler(error);
-            setFetchApStatus({
-                message: handledError,
-                status: FetchStatus.FAILED
-            });
-        }
-    }
 
     function handleApChange(event: any) {
         if (event) {
@@ -71,39 +49,8 @@ export default function FtthPage() {
         filterCto(event.target.value)
     }
 
-    async function fetchCpeList() {
-        if (selectedAp <= 0) return;
-        setFetchCpeStatus(FetchRunning);
-
-        try {
-            const { data }: { data: Cpe[] } = await api.get('cpe/' + selectedAp);
-            const ctoList = [] as string[];
-
-            data.forEach(function (obj) {
-                if (obj.nap && !ctoList.includes(obj.nap)) {
-                    ctoList.push(obj.nap)
-                }
-            });
-            const sorterAlphanumerical = new Intl.Collator(undefined, { numeric: true, sensitivity: 'base' });
-            const sortedCtoList = ctoList.sort(sorterAlphanumerical.compare);
-
-            setCpeList(data);
-            setCpeListCached(data);
-            setCtoList(sortedCtoList);
-
-            setFetchCpeStatus(FetchSuccessful);
-        } catch (error: any) {
-            const handledError = axiosErrorHandler(error);
-            setFetchCpeStatus({
-                message: handledError,
-                status: FetchStatus.FAILED
-            });
-        }
-
-    }
-
     function filterCto(cto: string) {
-        if (!cto || cto === "") { setCpeList(cpeListCached); return; }
+        if (!cto || cto === "") { filterCpeList(cpeListCached); return; }
 
         const cpeListFiltered = [] as Cpe[];
 
@@ -113,25 +60,8 @@ export default function FtthPage() {
             }
         });
 
-        setCpeList(cpeListFiltered)
+        filterCpeList(cpeListFiltered)
     }
-
-    function handleUsernameFilter(event: any) {
-        const value = event.target.value;
-
-        if (cpeList.length <= 0) return;
-        if (value.length <= 0) { setCpeList(cpeListCached); return; }
-
-        let newResult = [] as Cpe[];
-
-        cpeListCached.forEach(cpe => {
-            if (cpe.username && value && ((cpe.username).toUpperCase()).includes(value.toUpperCase())) {
-                newResult.push(cpe);
-            }
-        });
-
-        setCpeList(newResult);
-    };
 
     function handleSerialFilter(event: any) {
         const value = event.target.value;
@@ -140,7 +70,7 @@ export default function FtthPage() {
             return;
         }
         if (value.length === 0) {
-            setCpeList(cpeListCached);
+            filterCpeList(cpeListCached);
             return;
         }
 
@@ -152,14 +82,14 @@ export default function FtthPage() {
             }
         });
 
-        setCpeList(newResult);
+        filterCpeList(newResult);
     };
 
     function handleNameFilter(event: any) {
         const value = event.target.value;
 
         if (cpeList.length === 0) return;
-        if (value.length === 0) { setCpeList(cpeListCached); return; }
+        if (value.length === 0) { filterCpeList(cpeListCached); return; }
 
         let newResult = [] as Cpe[];
         cpeListCached.forEach(cpe => {
@@ -168,8 +98,29 @@ export default function FtthPage() {
             }
         });
 
-        setCpeList(newResult);
+        filterCpeList(newResult);
     };
+
+    function handleUsernameFilter(event: any) {
+        const value = event.target.value;
+
+        if (cpeList.length <= 0) return;
+        if (value.length <= 0) { filterCpeList(cpeListCached); return; }
+
+        let newResult = [] as Cpe[];
+
+        cpeListCached.forEach(cpe => {
+            if (cpe.username && value && ((cpe.username).toUpperCase()).includes(value.toUpperCase())) {
+                newResult.push(cpe);
+            }
+        });
+
+        filterCpeList(newResult);
+    };
+
+    function handleFetchCpeList() {
+        fetchCpeList(selectedAp);
+    }
 
     return (
         <AppBackground>
@@ -194,7 +145,7 @@ export default function FtthPage() {
                                 </FormControl>
                             </div>
                             <div>
-                                <Button type="submit" onClick={fetchCpeList} >PESQUISAR</Button>
+                                <Button type="submit" onClick={handleFetchCpeList} >PESQUISAR</Button>
                             </div>
                         </HorizontalWrapper>
                         <HorizontalWrapper>
