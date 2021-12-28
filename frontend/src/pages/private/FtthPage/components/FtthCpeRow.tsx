@@ -1,14 +1,14 @@
 import React, { useState } from 'react';
 import { format, parseISO } from "date-fns";
 import { GraphicEqOutlined, EmojiObjects, ArrowDropDownCircle, Details } from '@material-ui/icons';
+import { Button } from '@material-ui/core';
 import { LineChart, Line, CartesianGrid, XAxis, YAxis, Tooltip, Legend } from 'recharts';
 
 import Cpe from '../../../../@types/models/cpe/Cpe';
 import api from '../../../../api/api';
 import CpeRecord from '../../../../@types/models/cpe/CpeRecord';
 import { TableTd, TableTdExtra, TableTr } from '../styles';
-import { Button } from '@material-ui/core';
-import { ExtraTdContainer, ExtraTdContainerSeparator, ExtraContainer, CpeRecordContainer } from './styles';
+import { ExtraTdContainer, ExtraTdContainerSeparator, ExtraContainer, CpeRecordContainer, TableRowButtonContent } from './styles';
 import { axiosErrorHandler } from '../../../../utils/ErrorHandler/axiosErrorHandler';
 
 interface FtthCpeRowProps {
@@ -107,76 +107,83 @@ const FtthCpeRow: React.FC<FtthCpeRowProps> = ({ obj }) => {
             <TableTd>{obj.last_pon_index}</TableTd>
             <TableTd>{obj.last_online ? format(parseISO(obj.last_online), "dd/MM HH:mm") : 'Nunca'}</TableTd>
             <TableTdExtra style={{ display: expandRow ? '' : 'none' }}>
-                <div style={{ flexDirection: 'row' }}>
-                    <ExtraTdContainer>
-                        <Button onClick={() => fetchSignal()} variant="contained" endIcon={<EmojiObjects />}>
+                <ExtraTdContainer>
+                    <Button onClick={() => fetchSignal()} variant="contained">
+                        <TableRowButtonContent>
                             Ler sinal agora
-                        </Button>
+                            <EmojiObjects />
+                        </TableRowButtonContent>
+                    </Button>
+                    <ExtraContainer>
+                        {
+                            (fetchSignalNowStatus) ? <p>{fetchSignalNowStatus}</p> :
+                                (signalNow &&
+                                    <div>
+                                        <p>{format(signalNow.date, "dd/MM HH:mm")}</p>
+                                        <p>Rx: {signalNow.rx}db</p>
+                                        <p>Tx: {signalNow.tx}db</p>
+                                    </div>
+                                )
+                        }
+                    </ExtraContainer>
+                </ExtraTdContainer>
+                <ExtraTdContainerSeparator />
+
+                <ExtraTdContainer>
+                    <Button onClick={() => fetchCpeSignalRecords()} variant="contained">
+                        <TableRowButtonContent>
+                            Histórico de sinal
+                            <GraphicEqOutlined />
+                        </TableRowButtonContent>
+                    </Button>
+                    {fetchSignalHistoryStatus ? fetchSignalHistoryStatus : cpeRecordSignal.length > 0 &&
                         <ExtraContainer>
-                            {
-                                (fetchSignalNowStatus) ? <p>{fetchSignalNowStatus}</p> :
-                                    (signalNow &&
-                                        <div>
-                                            <p>{format(signalNow.date, "dd/MM HH:mm")}</p>
-                                            <p>Rx: {signalNow.rx}db</p>
-                                            <p>Tx: {signalNow.tx}db</p>
-                                        </div>
-                                    )
+                            <LineChart width={800} height={200} data={cpeRecordSignal}>
+                                <Tooltip />
+                                <XAxis dataKey="date" />
+                                <YAxis type="number" />
+                                <Line type="monotone" dataKey="rx" stroke="#FF0000" textAnchor="Rx" />
+                                <Line type="monotone" dataKey="tx" stroke="#0000ff" textAnchor="Tx" />
+                                <Legend />
+                                <CartesianGrid stroke="#ccc" />
+                            </LineChart>
+                        </ExtraContainer>
+                    }
+                </ExtraTdContainer>
+                <ExtraTdContainerSeparator />
+
+                <ExtraTdContainer>
+                    <Button onClick={() => triggerExpandExtra()} variant="contained">
+                        <TableRowButtonContent>
+                            Detalhes da ONU
+                            <Details />
+                        </TableRowButtonContent>
+                    </Button>
+                    {
+                        showExtra &&
+                        <ExtraContainer>
+                            <CpeRecordContainer>
+                                <p>Cadastrado: {obj.cadastrado}</p>
+                                <p>MAC no MK: {obj.mac_address}</p>
+                                <p>Pos. na PON: {obj.last_pon_index}</p>
+                                <p>Hw.: {obj.last_hardware_version}</p>
+                                <p>Sw.: {obj.last_software_version}</p>
+                            </CpeRecordContainer>
+                            {fetchExtraStatus ? <p>{fetchExtraStatus}</p> :
+                                (!fetchExtraStatus && latestCpeRecord) &&
+                                <CpeRecordContainer>
+                                    <p>Obtidos em: {format(parseISO(latestCpeRecord.datetime), "dd/MM HH:mm")}</p>
+                                    <p>ONU em NAT?: {latestCpeRecord.wan_pppoe_username ? "sim" : "não"}</p>
+                                    <p>Porta: {latestCpeRecord.port_name}</p>
+                                    <p>Speed: {latestCpeRecord.port_speed}</p>
+                                    <p>VLAN: {latestCpeRecord.port_vlan}</p>
+                                    <p>ARP ONU: {latestCpeRecord.port_mac}</p>
+                                    <p>Telefone na ONU: {latestCpeRecord.tel_num}</p>
+                                </CpeRecordContainer>
                             }
                         </ExtraContainer>
-                    </ExtraTdContainer>
-                    <ExtraTdContainerSeparator />
-
-                    <ExtraTdContainer>
-                        <Button onClick={() => fetchCpeSignalRecords()} variant="contained" endIcon={<GraphicEqOutlined />}>
-                            Histórico de sinal
-                        </Button>
-                        {fetchSignalHistoryStatus ? fetchSignalHistoryStatus : cpeRecordSignal.length > 0 &&
-                            <ExtraContainer>
-                                <LineChart width={800} height={200} data={cpeRecordSignal}>
-                                    <Tooltip />
-                                    <XAxis dataKey="date" />
-                                    <YAxis type="number" />
-                                    <Line type="monotone" dataKey="rx" stroke="#FF0000" textAnchor="Rx" />
-                                    <Line type="monotone" dataKey="tx" stroke="#0000ff" textAnchor="Tx" />
-                                    <Legend />
-                                    <CartesianGrid stroke="#ccc" />
-                                </LineChart>
-                            </ExtraContainer>
-                        }
-                    </ExtraTdContainer>
-                    <ExtraTdContainerSeparator />
-
-                    <ExtraTdContainer>
-                        <Button onClick={() => triggerExpandExtra()} variant="contained" endIcon={<Details />}>
-                            Detalhes da ONU
-                        </Button>
-                        {
-                            showExtra &&
-                            <ExtraContainer>
-                                <CpeRecordContainer>
-                                    <p>Cadastrado: {obj.cadastrado}</p>
-                                    <p>MAC no MK: {obj.mac_address}</p>
-                                    <p>Pos. na PON: {obj.last_pon_index}</p>
-                                    <p>Hw.: {obj.last_hardware_version}</p>
-                                    <p>Sw.: {obj.last_software_version}</p>
-                                </CpeRecordContainer>
-                                {fetchExtraStatus ? <p>{fetchExtraStatus}</p> :
-                                    (!fetchExtraStatus && latestCpeRecord) &&
-                                    <CpeRecordContainer>
-                                        <p>Obtidos em: {format(parseISO(latestCpeRecord.datetime), "dd/MM HH:mm")}</p>
-                                        <p>ONU em NAT?: {latestCpeRecord.wan_pppoe_username ? "sim" : "não"}</p>
-                                        <p>Porta: {latestCpeRecord.port_name}</p>
-                                        <p>Speed: {latestCpeRecord.port_speed}</p>
-                                        <p>VLAN: {latestCpeRecord.port_vlan}</p>
-                                        <p>ARP ONU: {latestCpeRecord.port_mac}</p>
-                                        <p>Telefone na ONU: {latestCpeRecord.tel_num}</p>
-                                    </CpeRecordContainer>
-                                }
-                            </ExtraContainer>
-                        }
-                    </ExtraTdContainer>
-                </div>
+                    }
+                </ExtraTdContainer>
             </TableTdExtra>
         </TableTr>
     );

@@ -59,7 +59,7 @@ export const TableTdExtra = styled.td`
   border-top: none;
   display: flex;
   flex: 1;
-  flex-direction: row;
+  flex-direction: column;
   grid-column: 1/-1;
   font-size: 13px;
   background-color: #ffff;
