@@ -42,7 +42,7 @@ const PhoneSubscriberRow: React.FC<PhoneSubscriberRowProps> = ({ obj }) => {
 
     return (
         <TableTr>
-            <TableTd>{obj.erp_contract_id}:{obj.subscriber_name}</TableTd>
+            <TableTd>{obj.erp_contract_id} - {obj.subscriber_name}</TableTd>
             <TableTd>{obj.phone_number}</TableTd>
             <TableTd>{dicoverSipDevice()}</TableTd>
             <TableTd>{obj.ap_name}</TableTd>
