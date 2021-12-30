@@ -29,6 +29,13 @@ export default function AppMenu() {
         </div>
         <Divider />
         <List>
+          <ListItem component={Link} to="/gpon" button onClick={toggleMenu}>
+            <ListItemIcon>
+              <AccountTree />
+            </ListItemIcon>
+            <ListItemText primary="GPON" />
+          </ListItem>
+
           <ListItem component={Link} to="/ftth" button onClick={toggleMenu}>
             <ListItemIcon>
               <AccountTree />
