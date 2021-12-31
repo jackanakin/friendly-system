@@ -1,6 +1,11 @@
 import { FetchStatus } from "../../@enum/api/FetchStatus";
 import AxiosFetch from "../../@types/api/AxiosFetch";
 
+export const FetchEmpty = {
+    status: FetchStatus.EMPTY,
+    message: "Nenhum resultado"
+} as AxiosFetch;
+
 export const FetchIdle = {
     status: FetchStatus.IDLE
 } as AxiosFetch;
@@ -10,7 +15,7 @@ export const FetchRunning = {
 } as AxiosFetch;
 
 export const FetchSuccessful = {
-    status: FetchStatus.SUCESS
+    status: FetchStatus.SUCCESS
 } as AxiosFetch;
 
 export const FetchFailed = {

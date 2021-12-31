@@ -153,7 +153,7 @@ export default function FtthRow({ obj }: FtthRowProps) {
                                 {
                                     fetchOnuSignalStatus.status === FetchStatus.FAILED ? <p>{fetchOnuSignalStatus.message}</p> :
                                         fetchOnuSignalStatus.status === FetchStatus.LOADING ? <CircularProgress /> :
-                                            (fetchOnuSignalHistoryStatus.status === FetchStatus.SUCESS && signalNow) &&
+                                            (fetchOnuSignalHistoryStatus.status === FetchStatus.SUCCESS && signalNow) &&
                                             <div>
                                                 <p>{format(signalNow.date, "dd/MM HH:mm")}</p>
                                                 <p>Rx: {signalNow.rx}db</p>
@@ -174,7 +174,7 @@ export default function FtthRow({ obj }: FtthRowProps) {
                             <ExtraContainer>
                                 {fetchOnuSignalHistoryStatus.status === FetchStatus.FAILED ? <p>{fetchOnuSignalHistoryStatus.message}</p> :
                                     fetchOnuSignalHistoryStatus.status === FetchStatus.LOADING ? <CircularProgress /> :
-                                        fetchOnuSignalHistoryStatus.status === FetchStatus.SUCESS &&
+                                        fetchOnuSignalHistoryStatus.status === FetchStatus.SUCCESS &&
                                         <LineChart width={800} height={200} data={cpeRecordSignal}>
                                             <Tooltip />
                                             <XAxis dataKey="date" />
@@ -199,7 +199,7 @@ export default function FtthRow({ obj }: FtthRowProps) {
                             {
                                 fetchOnuDetailStatus.status === FetchStatus.FAILED ? <ExtraContainer><p>{fetchOnuDetailStatus.message}</p></ExtraContainer> :
                                     fetchOnuDetailStatus.status === FetchStatus.LOADING ? <ExtraContainer><CircularProgress /></ExtraContainer> :
-                                        (fetchOnuDetailStatus.status === FetchStatus.SUCESS && cpeDetails) &&
+                                        (fetchOnuDetailStatus.status === FetchStatus.SUCCESS && cpeDetails) &&
                                         <ExtraContainer>
                                             <div>
                                                 <p>Cadastrado: {obj.cadastrado}</p>
