@@ -5,7 +5,7 @@ import { Ap, GponCount, GponIntegration } from "../../../_lib/database/main";
 import GponGraphDTO, { GponGraphValues } from "../../@dto/gpon/GponGraphDTO";
 import { internalErrorHandler } from "../../@exceptions/_handler/InternalErrorHandler";
 
-const sorter = new Intl.Collator(undefined, {numeric: true, sensitivity: 'base'});
+const sorter = new Intl.Collator(undefined, { numeric: true, sensitivity: 'base' });
 class GponCountController {
     async index(req: Request, res: Response): Promise<Response<GponGraphDTO>> {
         try {
@@ -37,7 +37,7 @@ class GponCountController {
                     ["gpon_integration_id", "DESC"]
                 ]
             });
-            
+
             gponCount.reverse();
             integrations.reverse();
             const data: GponGraphValues[] = [];

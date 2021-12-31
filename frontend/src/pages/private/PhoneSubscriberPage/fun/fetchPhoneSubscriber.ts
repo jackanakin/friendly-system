@@ -1,11 +1,27 @@
-import CpeWithLatestCpeRecordDTO from "../../../../@types/services/phone_subscriber/CpeWithLatestCpeRecordDTO";
+import PhoneSubscriberDTO from "../../../../@dto/phone_subscriber/PhoneSubscriberDTO";
+import { FetchStatus } from "../../../../@enum/api/FetchStatus";
+import AxiosFetch from "../../../../@types/api/AxiosFetch";
 import api from "../../../../api/api";
+import { axiosErrorHandler } from "../../../../utils/ErrorHandler/axiosErrorHandler";
 
-export async function fetchPhoneSubscriber(): Promise<CpeWithLatestCpeRecordDTO[]> {
-    const { data }: { data: CpeWithLatestCpeRecordDTO[] } = await api.get('phone_subscriber');
+export async function fetchPhoneSubscriber(promise: (p: Promise<any>) => Promise<any>, resolve: (data: PhoneSubscriberDTO) => void, reject: (error: AxiosFetch) => void): Promise<void> {
+    promise(fetch())
+        .then(resolve)
+        .catch((error: any) => {
+            if (!error.isCanceled) {
+                const handledError = axiosErrorHandler(error);
+                reject({
+                    status: FetchStatus.FAILED,
+                    message: handledError
+                });
+            }
+        });
+}
 
-    data.forEach(obj => {
-        console.log("dicoverSipDevice")
+async function fetch(): Promise<PhoneSubscriberDTO> {
+    const { data }: { data: PhoneSubscriberDTO } = await api.get('phone_subscriber');
+
+    data.subscribers_info.forEach(obj => {
         //check if is registered on the ONU FXS
         if (obj.pots_enable && obj.phone_number === obj.tel_num) {
             obj.sipDiscovery = `ONU/${obj.tel_num}@${obj.signal_vlan}/${obj.software_version}`;

@@ -10,66 +10,44 @@ import CpeWithLatestCpeRecordDTO from '../../../@types/services/phone_subscriber
 import PhoneSubscriberInconsistenceDTO from '../../../@types/services/phone_subscriber/PhoneSubscriberInconsistenceDTO';
 import AxiosFetch from '../../../@types/api/AxiosFetch';
 import { FetchRunning, FetchSuccessful } from '../../../@dto/api/FetchStatus';
-import { axiosErrorHandler } from '../../../utils/ErrorHandler/axiosErrorHandler';
 import { FetchStatus } from '../../../@enum/api/FetchStatus';
 import { ErrorPage } from '../../../components/ErrorPage/ErrorPage';
 import { LoadingPage } from '../../../components/LoadingPage/LoadingPage';
 import { usePromise } from '../../../hooks/@promises/usePromise';
 import { fetchPhoneSubscriber } from './fun/fetchPhoneSubscriber';
-import { fetchInconsistentPhoneSubscriber } from './fun/fetchInconsistentPhoneSubscriber';
+import PhoneSubscriberDTO from '../../../@dto/phone_subscriber/PhoneSubscriberDTO';
 
 export default function PhoneSubscriberPage() {
     const { promise } = usePromise();
 
     const [phoneSubscribers, setPhoneSubscribers] = useState<CpeWithLatestCpeRecordDTO[]>([]);
-    const [fetchPhoneSubscriberStatus, setFetchPhoneSubscriberStatus] = useState<AxiosFetch>(FetchRunning);
-
     const [inconsistentPhoneSubscribers, setInconsistentPhoneSubscribers] = useState<PhoneSubscriberInconsistenceDTO[]>([]);
 
-    const loadPhoneSubscriber = useCallback(() => {
-        setFetchPhoneSubscriberStatus(FetchRunning);
-        setPhoneSubscribers([]);
+    const [fetchLoadPageResourcesStatus, setFetchLoadPageResourcesStatus] = useState<AxiosFetch>(FetchRunning);
+
+    const resolvePageResources = useCallback((data: PhoneSubscriberDTO) => {
+        setInconsistentPhoneSubscribers(data.inconsistences);
+        setPhoneSubscribers(data.subscribers_info);
+        setFetchLoadPageResourcesStatus(FetchSuccessful);
+    }, []);
+
+    const loadPageResources = useCallback(() => {
+        setFetchLoadPageResourcesStatus(FetchRunning);
         setInconsistentPhoneSubscribers([]);
+        setPhoneSubscribers([]);
 
-        promise(fetchPhoneSubscriber())
-            .then((data: CpeWithLatestCpeRecordDTO[]) => {
-                setPhoneSubscribers(data);
-
-                promise(fetchInconsistentPhoneSubscriber())
-                    .then((data: PhoneSubscriberInconsistenceDTO[]) => {
-                        setInconsistentPhoneSubscribers(data);
-                        setFetchPhoneSubscriberStatus(FetchSuccessful);
-                        
-                    }).catch((error: any) => {
-                        if (!error.isCanceled) {
-                            const handledError = axiosErrorHandler(error);
-                            setFetchPhoneSubscriberStatus({
-                                status: FetchStatus.FAILED,
-                                message: handledError
-                            });
-                        }
-                    });
-            }).catch((error: any) => {
-                if (!error.isCanceled) {
-                    const handledError = axiosErrorHandler(error);
-                    setFetchPhoneSubscriberStatus({
-                        status: FetchStatus.FAILED,
-                        message: handledError
-                    });
-                }
-            });
+        fetchPhoneSubscriber(promise, resolvePageResources, setFetchLoadPageResourcesStatus);
         // eslint-disable-next-line react-hooks/exhaustive-deps
     }, []);
 
-
     useEffect(() => {
-        loadPhoneSubscriber();
-    }, [loadPhoneSubscriber]);
+        loadPageResources();
+    }, [loadPageResources]);
 
     return (
         <AppBackground>
-            {fetchPhoneSubscriberStatus.status === FetchStatus.LOADING ?
-                <LoadingPage /> : fetchPhoneSubscriberStatus.status === FetchStatus.FAILED ? <ErrorPage callback={loadPhoneSubscriber} /> :
+            {fetchLoadPageResourcesStatus.status === FetchStatus.LOADING ?
+                <LoadingPage /> : fetchLoadPageResourcesStatus.status === FetchStatus.FAILED ? <ErrorPage callback={loadPageResources} /> :
                     <Surface>
                         <HorizontalWrapper>
                             {inconsistentPhoneSubscribers.length > 0 &&

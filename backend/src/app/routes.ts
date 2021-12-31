@@ -5,7 +5,6 @@ import GponCountController from './controllers/Gpon/GponCountController'
 import SessionController from './controllers/Session/SessionController';
 import ApController from './controllers/Ap/ApController';
 import PhoneSubscriberController from './controllers/PhoneSubscriber/PhoneSubscriberController';
-import PhoneSubscriberInconsistencesController from './controllers/PhoneSubscriber/PhoneSubscriberInconsistencesController';
 import SessionValidatorMiddleware from './middlewares/SessionValidatorMiddleware';
 import CpeRxTxHistoryController from './controllers/Cpe/CpeRxTxHistoryController';
 import CpeRxTxActualController from './controllers/Cpe/CpeRxTxActualController';
@@ -31,7 +30,6 @@ routes.use(SessionValidatorMiddleware);
 
 routes.delete('/sessions', SessionController.delete);
 routes.get('/phone_subscriber', PhoneSubscriberController.index);
-routes.get('/phone_subscriber/inconsistences', PhoneSubscriberInconsistencesController.index);
 
 routes.get('/gpon/count/:ap_id', GponCountController.index);
 routes.get('/gpon/txaverage/:ap_id', GponTxAverageController.index);
