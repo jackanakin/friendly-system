@@ -28,9 +28,8 @@ import { ErrorComponent } from '../../../components/ErrorComponent/ErrorComponen
 import { FetchIdle, FetchRunning, FetchSuccessful } from '../../../@dto/api/FetchStatus';
 import AxiosFetch from '../../../@types/api/AxiosFetch';
 import { usePromise } from '../../../hooks/@promises/usePromise';
-import { axiosErrorHandler } from '../../../utils/ErrorHandler/axiosErrorHandler';
-import { fetchFtthApList } from './fun/fetchFtthApList';
 import { fetchCpeList, FetchCpeListResponse } from './fun/fetchFtthCpeList';
+import { fetchApList } from './fun/fetchFtthApList';
 
 export default function FtthPage() {
     const { promise } = usePromise();
@@ -46,49 +45,35 @@ export default function FtthPage() {
     const [selectedAp, setSelectedAp] = useState<number>(-1);
     const [selectedCto, setSelectedCto] = useState<string>("");
 
-    async function loadCpeList() {
+    const resolveCpeList = useCallback((data: FetchCpeListResponse) => {
+        setCpeList(data.cpeList);
+        setCpeListCached(data.cpeList);
+        setCtoList(data.ctoList);
+        setFetchCpeStatus(FetchSuccessful);
+    }, []);
+
+    const resolveApList = useCallback((data: Ap[]) => {
+        setApList(data);
+        setFetchApStatus(FetchSuccessful);
+    }, []);
+
+    const loadCpeList = () => {
         setFetchCpeStatus(FetchRunning);
         setSelectedCto("");
 
-        promise(fetchCpeList(selectedAp))
-            .then((data: FetchCpeListResponse) => {
-                setCpeList(data.cpeList);
-                setCpeListCached(data.cpeList);
-                setCtoList(data.ctoList);
-
-                setFetchCpeStatus(FetchSuccessful);
-            }).catch((error: any) => {
-                if (!error.isCanceled) {
-                    const handledError = axiosErrorHandler(error);
-                    setFetchCpeStatus({
-                        status: FetchStatus.FAILED,
-                        message: handledError
-                    });
-                }
-            });
+        fetchCpeList({ ap_id: selectedAp }, promise, resolveCpeList, setFetchCpeStatus);
+        // eslint-disable-next-line react-hooks/exhaustive-deps
     };
 
-    const loadApList = useCallback(() => {
+    const loadPageResources = useCallback(() => {
         setFetchApStatus(FetchRunning);
-        promise(fetchFtthApList())
-            .then((data: Ap[]) => {
-                setApList(data);
-                setFetchApStatus(FetchSuccessful);
-            }).catch((error: any) => {
-                if (!error.isCanceled) {
-                    const handledError = axiosErrorHandler(error);
-                    setFetchApStatus({
-                        status: FetchStatus.FAILED,
-                        message: handledError
-                    });
-                }
-            });
+        fetchApList(promise, resolveApList, setFetchApStatus);
         // eslint-disable-next-line react-hooks/exhaustive-deps
     }, []);
 
     useEffect(() => {
-        loadApList();
-    }, [loadApList]);
+        loadPageResources();
+    }, [loadPageResources]);
 
     function handleApChange(event: any) {
         if (event) {
@@ -173,7 +158,7 @@ export default function FtthPage() {
     return (
         <AppBackground>
             {fetchApStatus.status === FetchStatus.LOADING ?
-                <LoadingPage /> : fetchApStatus.status === FetchStatus.FAILED ? <ErrorPage callback={loadApList} /> :
+                <LoadingPage /> : fetchApStatus.status === FetchStatus.FAILED ? <ErrorPage callback={loadPageResources} /> :
                     <Surface>
                         <HorizontalWrapper>
                             <div style={{ width: 50 + '%', padding: 10 + 'px' }}>
