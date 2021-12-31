@@ -20,12 +20,9 @@ import { ErrorComponent } from '../../../components/ErrorComponent/ErrorComponen
 import GponGraphDTO from '../../../@types/models/gpon/GponGraphDTO';
 import { FetchIdle, FetchRunning, FetchSuccessful } from '../../../@dto/api/FetchStatus';
 import AxiosFetch from '../../../@types/api/AxiosFetch';
-import { fetchGponCount } from './fun/fetchGponCount';
-import { fetchGponTxAverage } from './fun/fetchGponTxAverage';
-import { fetchGponRxAverage } from './fun/fetchGponRxAverage';
-import { fetchGponApList } from './fun/fetchGponApList';
-import { axiosErrorHandler } from '../../../utils/ErrorHandler/axiosErrorHandler';
+import { fetchApList } from './fun/fetchGponApList';
 import { usePromise } from '../../../hooks/@promises/usePromise';
+import { fetchGponCount, fetchGponRxAverage, fetchGponTxAverage } from './fun/fetchGpon';
 
 export default function GponPage() {
     const { promise } = usePromise();
@@ -43,7 +40,25 @@ export default function GponPage() {
     const [selectedAp, setSelectedAp] = useState<number>(-1);
     //const [selectedCto, setSelectedCto] = useState<string>("");
 
+    const resolveGponTxAverage = useCallback((data: GponGraphDTO) => {
+        setGponTxAverageData(data);
+        setFetchGponTxAverageStatus(FetchSuccessful);
+    }, []);
+    const resolveGponRxAverage = useCallback((data: GponGraphDTO) => {
+        setGponRxAverageData(data);
+        setFetchGponRxAverageStatus(FetchSuccessful);
+    }, []);
+    const resolveGponCount = useCallback((data: GponGraphDTO) => {
+        setGponCountData(data);
+        setFetchGponCountDataStatus(FetchSuccessful);
+    }, []);
+    const resolveApList = useCallback((data: Ap[]) => {
+        setApList(data);
+        setFetchApStatus(FetchSuccessful);
+    }, []);
+
     function loadGpon() {
+        if (selectedAp <= 0) return;
         loadGponCount();
         loadGponRxAverage();
         loadGponTxAverage();
@@ -51,79 +66,28 @@ export default function GponPage() {
 
     async function loadGponRxAverage() {
         setFetchGponRxAverageStatus(FetchRunning);
-
-        promise(fetchGponRxAverage(selectedAp))
-            .then((data: GponGraphDTO) => {
-                setGponRxAverageData(data);
-                setFetchGponRxAverageStatus(FetchSuccessful);
-            }).catch((error: any) => {
-                if (!error.isCanceled) {
-                    const handledError = axiosErrorHandler(error);
-                    setFetchGponRxAverageStatus({
-                        status: FetchStatus.FAILED,
-                        message: handledError
-                    });
-                }
-            });
+        fetchGponRxAverage({ ap_id: selectedAp }, promise, resolveGponRxAverage, setFetchGponRxAverageStatus);
     };
 
     async function loadGponTxAverage() {
         setFetchGponTxAverageStatus(FetchRunning);
-
-        promise(fetchGponTxAverage(selectedAp))
-            .then((data: GponGraphDTO) => {
-                setGponTxAverageData(data);
-                setFetchGponTxAverageStatus(FetchSuccessful);
-            }).catch((error: any) => {
-                if (!error.isCanceled) {
-                    const handledError = axiosErrorHandler(error);
-                    setFetchGponTxAverageStatus({
-                        status: FetchStatus.FAILED,
-                        message: handledError
-                    });
-                }
-            });
+        fetchGponTxAverage({ ap_id: selectedAp }, promise, resolveGponTxAverage, setFetchGponTxAverageStatus);
     };
 
     async function loadGponCount() {
         setFetchGponCountDataStatus(FetchRunning);
-
-        promise(fetchGponCount(selectedAp))
-            .then((data: GponGraphDTO) => {
-                setGponCountData(data);
-                setFetchGponCountDataStatus(FetchSuccessful);
-            }).catch((error: any) => {
-                if (!error.isCanceled) {
-                    const handledError = axiosErrorHandler(error);
-                    setFetchGponCountDataStatus({
-                        status: FetchStatus.FAILED,
-                        message: handledError
-                    });
-                }
-            });
+        fetchGponCount({ ap_id: selectedAp }, promise, resolveGponCount, setFetchGponCountDataStatus);
     };
 
-    const loadApList = useCallback(() => {
+    const loadPageResources = useCallback(() => {
         setFetchApStatus(FetchRunning);
-        promise(fetchGponApList())
-            .then((data: Ap[]) => {
-                setApList(data);
-                setFetchApStatus(FetchSuccessful);
-            }).catch((error: any) => {
-                if (!error.isCanceled) {
-                    const handledError = axiosErrorHandler(error);
-                    setFetchApStatus({
-                        status: FetchStatus.FAILED,
-                        message: handledError
-                    });
-                }
-            });
+        fetchApList(promise, resolveApList, setFetchApStatus);
         // eslint-disable-next-line react-hooks/exhaustive-deps
     }, []);
 
     useEffect(() => {
-        loadApList();
-    }, [loadApList]);
+        loadPageResources();
+    }, [loadPageResources]);
 
     function handleApChange(event: any) {
         if (event) {
@@ -134,7 +98,7 @@ export default function GponPage() {
     return (
         <AppBackground>
             {fetchApStatus.status === FetchStatus.LOADING ?
-                <LoadingPage /> : fetchApStatus.status === FetchStatus.FAILED ? <ErrorPage callback={loadApList} /> :
+                <LoadingPage /> : fetchApStatus.status === FetchStatus.FAILED ? <ErrorPage callback={loadPageResources} /> :
                     <Surface>
                         <HorizontalWrapper>
                             <div style={{ width: 50 + '%', padding: 10 + 'px' }}>
