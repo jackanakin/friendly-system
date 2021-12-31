@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import Button from '@material-ui/core/Button';
 import FormControl from '@material-ui/core/FormControl';
 import Select from '@material-ui/core/Select';
@@ -25,23 +25,70 @@ import { LoadingPage } from '../../../components/LoadingPage/LoadingPage';
 import { ErrorPage } from '../../../components/ErrorPage/ErrorPage';
 import { LoadingComponent } from '../../../components/LoadingComponent/LoadingComponent';
 import { ErrorComponent } from '../../../components/ErrorComponent/ErrorComponent';
-import { useFtth } from '../../../providers/ftth/FtthProvider';
+import { FetchIdle, FetchRunning, FetchSuccessful } from '../../../@dto/api/FetchStatus';
+import AxiosFetch from '../../../@types/api/AxiosFetch';
+import { usePromise } from '../../../hooks/@promises/usePromise';
+import { axiosErrorHandler } from '../../../utils/ErrorHandler/axiosErrorHandler';
+import { fetchFtthApList } from './fun/fetchFtthApList';
+import { fetchCpeList, FetchCpeListResponse } from './fun/fetchFtthCpeList';
 
 export default function FtthPage() {
+    const { promise } = usePromise();
+
+    const [apList, setApList] = useState<Ap[]>([]);
+    const [fetchApStatus, setFetchApStatus] = useState<AxiosFetch>(FetchRunning);
+
+    const [cpeList, setCpeList] = useState<Cpe[]>([]);
+    const [cpeListCached, setCpeListCached] = useState<Cpe[]>([]);
+    const [ctoList, setCtoList] = useState<string[]>([]);
+    const [fetchCpeStatus, setFetchCpeStatus] = useState<AxiosFetch>(FetchIdle);
+
     const [selectedAp, setSelectedAp] = useState<number>(-1);
     const [selectedCto, setSelectedCto] = useState<string>("");
 
-    const {
-        fetchApStatus, fetchCpeStatus,
-        fetchApList, apList,
-        fetchCpeList, cpeList, cpeListCached, ctoList, filterCpeList
-    } = useFtth();
+    async function loadCpeList() {
+        setFetchCpeStatus(FetchRunning);
+        setSelectedCto("");
 
-    useEffect(() => {
-        fetchApList();
+        promise(fetchCpeList(selectedAp))
+            .then((data: FetchCpeListResponse) => {
+                setCpeList(data.cpeList);
+                setCpeListCached(data.cpeList);
+                setCtoList(data.ctoList);
+
+                setFetchCpeStatus(FetchSuccessful);
+            }).catch((error: any) => {
+                if (!error.isCanceled) {
+                    const handledError = axiosErrorHandler(error);
+                    setFetchCpeStatus({
+                        status: FetchStatus.FAILED,
+                        message: handledError
+                    });
+                }
+            });
+    };
+
+    const loadApList = useCallback(() => {
+        setFetchApStatus(FetchRunning);
+        promise(fetchFtthApList())
+            .then((data: Ap[]) => {
+                setApList(data);
+                setFetchApStatus(FetchSuccessful);
+            }).catch((error: any) => {
+                if (!error.isCanceled) {
+                    const handledError = axiosErrorHandler(error);
+                    setFetchApStatus({
+                        status: FetchStatus.FAILED,
+                        message: handledError
+                    });
+                }
+            });
         // eslint-disable-next-line react-hooks/exhaustive-deps
     }, []);
 
+    useEffect(() => {
+        loadApList();
+    }, [loadApList]);
 
     function handleApChange(event: any) {
         if (event) {
@@ -55,7 +102,7 @@ export default function FtthPage() {
     }
 
     function filterCto(cto: string) {
-        if (!cto || cto === "") { filterCpeList(cpeListCached); return; }
+        if (!cto || cto === "") { setCpeList(cpeListCached); return; }
 
         const cpeListFiltered = [] as Cpe[];
 
@@ -65,7 +112,7 @@ export default function FtthPage() {
             }
         });
 
-        filterCpeList(cpeListFiltered)
+        setCpeList(cpeListFiltered)
     }
 
     function handleSerialFilter(event: any) {
@@ -75,7 +122,7 @@ export default function FtthPage() {
             return;
         }
         if (value.length === 0) {
-            filterCpeList(cpeListCached);
+            setCpeList(cpeListCached);
             return;
         }
 
@@ -87,14 +134,14 @@ export default function FtthPage() {
             }
         });
 
-        filterCpeList(newResult);
+        setCpeList(newResult);
     };
 
     function handleNameFilter(event: any) {
         const value = event.target.value;
 
         if (cpeList.length === 0) return;
-        if (value.length === 0) { filterCpeList(cpeListCached); return; }
+        if (value.length === 0) { setCpeList(cpeListCached); return; }
 
         let newResult = [] as Cpe[];
         cpeListCached.forEach(cpe => {
@@ -103,14 +150,14 @@ export default function FtthPage() {
             }
         });
 
-        filterCpeList(newResult);
+        setCpeList(newResult);
     };
 
     function handleUsernameFilter(event: any) {
         const value = event.target.value;
 
         if (cpeList.length <= 0) return;
-        if (value.length <= 0) { filterCpeList(cpeListCached); return; }
+        if (value.length <= 0) { setCpeList(cpeListCached); return; }
 
         let newResult = [] as Cpe[];
 
@@ -120,17 +167,13 @@ export default function FtthPage() {
             }
         });
 
-        filterCpeList(newResult);
+        setCpeList(newResult);
     };
-
-    function handleFetchCpeList() {
-        fetchCpeList(selectedAp);
-    }
 
     return (
         <AppBackground>
             {fetchApStatus.status === FetchStatus.LOADING ?
-                <LoadingPage /> : fetchApStatus.status === FetchStatus.FAILED ? <ErrorPage callback={fetchApList} /> :
+                <LoadingPage /> : fetchApStatus.status === FetchStatus.FAILED ? <ErrorPage callback={loadApList} /> :
                     <Surface>
                         <HorizontalWrapper>
                             <div style={{ width: 50 + '%', padding: 10 + 'px' }}>
@@ -150,7 +193,7 @@ export default function FtthPage() {
                                 </FormControl>
                             </div>
                             <div>
-                                <Button type="submit" onClick={handleFetchCpeList} >PESQUISAR</Button>
+                                <Button type="submit" onClick={loadCpeList}>PESQUISAR</Button>
                             </div>
                         </HorizontalWrapper>
                         <HorizontalWrapper>
