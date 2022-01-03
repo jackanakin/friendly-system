@@ -11,6 +11,9 @@ import CpeRxTxActualController from './controllers/Cpe/CpeRxTxActualController';
 import CpeDetailsController from './controllers/Cpe/CpeDetailsController';
 import GponTxAverageController from './controllers/Gpon/GponTxAverageController';
 import GponRxAverageController from './controllers/Gpon/GponRxAverageController';
+import CtoCountController from './controllers/Cto/CtoCountController';
+import CtoRxAverageController from './controllers/Cto/CtoRxAverageController';
+import CtoTxAverageController from './controllers/Cto/CtoTxAverageController';
 
 const routes = Router();
 
@@ -31,6 +34,9 @@ routes.use(SessionValidatorMiddleware);
 routes.delete('/sessions', SessionController.delete);
 routes.get('/phone_subscriber', PhoneSubscriberController.index);
 
+routes.get('/cto/count/:ap_id', CtoCountController.index);
+routes.get('/cto/rxaverage/:ap_id', CtoRxAverageController.index);
+routes.get('/cto/txaverage/:ap_id', CtoTxAverageController.index);
 routes.get('/gpon/count/:ap_id', GponCountController.index);
 routes.get('/gpon/txaverage/:ap_id', GponTxAverageController.index);
 routes.get('/gpon/rxaverage/:ap_id', GponRxAverageController.index);

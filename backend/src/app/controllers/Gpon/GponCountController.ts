@@ -4,8 +4,8 @@ import { Op } from "sequelize";
 import { Ap, GponCount, GponIntegration } from "../../../_lib/database/main";
 import GponGraphDTO, { GponGraphValues } from "../../@dto/gpon/GponGraphDTO";
 import { internalErrorHandler } from "../../@exceptions/_handler/InternalErrorHandler";
+import { aplhanumericalSorter } from "../../utils/sorter/IntlCollatorSorters";
 
-const sorter = new Intl.Collator(undefined, { numeric: true, sensitivity: 'base' });
 class GponCountController {
     async index(req: Request, res: Response): Promise<Response<GponGraphDTO>> {
         try {
@@ -21,7 +21,7 @@ class GponCountController {
                 ],
             });
 
-            if (integrations.length === 0) return res.json([]);
+            if (integrations.length === 0) return res.json(null);
             const integrations_ids = integrations.map(x => x.id);
 
             const gponCount = await GponCount.findAll({
@@ -60,7 +60,7 @@ class GponCountController {
 
             return res.json({
                 data: data,
-                keys: Array.from(keys).sort(sorter.compare)
+                keys: Array.from(keys).sort(aplhanumericalSorter.compare)
             } as GponGraphDTO);
         } catch (error) {
             return internalErrorHandler(error, res);

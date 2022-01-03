@@ -21,7 +21,7 @@ class GponTxAverageController {
                 ],
             });
 
-            if (integrations.length === 0) return res.json([]);
+            if (integrations.length === 0) return res.json(null);
             const integrations_ids = integrations.map(x => x.id);
 
             const gponCount = await GponTxAverage.findAll({
