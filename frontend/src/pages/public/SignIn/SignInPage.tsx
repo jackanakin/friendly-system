@@ -1,59 +1,20 @@
 import { CircularProgress } from "@material-ui/core";
-import React, { useState } from "react";
-import { useLocation, useNavigate } from "react-router-dom";
-import * as Yup from "yup";
+import React from "react";
 
-import { FetchIdle, FetchRunning } from "../../../@dto/api/FetchStatus";
 import { FetchStatus } from "../../../@enum/api/FetchStatus";
-import AxiosFetch from "../../../@types/api/AxiosFetch";
 import { useAuth } from "../../../providers/auth/AuthProvider";
-import { axiosErrorHandler } from "../../../utils/ErrorHandler/axiosErrorHandler";
 import { Wrapper, Content } from "./styles";
 
-const schema = Yup.object().shape({
-    email: Yup.string()
-        .email("Insira um e-mail válido")
-        .required("O e-mail é obrigatório"),
-    password: Yup.string()
-        .min(6, "Mínimo de 6 caracteres")
-        .required("A senha é obrigatória")
-});
-
 export default function SignInPage() {
-    const { signin } = useAuth();
-    const navigate = useNavigate();
-    const location = useLocation();
-
-    const [fetchLoginStatus, setFetchLoginStatus] = useState<AxiosFetch>(FetchIdle);
+    const { signin, fetchLoginStatus } = useAuth();
 
     async function handleSubmit(event: React.FormEvent<HTMLFormElement>) {
         event.preventDefault();
-        setFetchLoginStatus(FetchRunning);
 
-        try {
-            const data = new FormData(event.target as HTMLFormElement);
-            const email = data.get("email") as string;
-            const password = data.get("password") as string;
-
-            const isValid = await schema.isValid({ email, password });
-
-            if (!isValid) {
-                setFetchLoginStatus({
-                    status: FetchStatus.FAILED,
-                    message: "Falha na autenticação"
-                });
-            } else {
-                await signin({ email, password });
-                const from = location.state?.from?.pathname || "/";
-                navigate(from, { replace: true });
-            }
-        } catch (error) {
-            const handledError = axiosErrorHandler(error);
-            setFetchLoginStatus({
-                status: FetchStatus.FAILED,
-                message: handledError
-            });
-        }
+        const data = new FormData(event.target as HTMLFormElement);
+        const email = data.get("email") as string;
+        const password = data.get("password") as string;
+        signin({ email, password });
     }
 
     return (
