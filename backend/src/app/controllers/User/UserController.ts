@@ -30,8 +30,8 @@ class UserController {
         }
 
         req.body.enabled = true
-        const { id, name, email, provider } = await User.create(req.body);
-        return res.json({ id, name, email, provider });
+        const { id, name, email } = await User.create(req.body);
+        return res.json({ id, name, email });
     }
 }
 
