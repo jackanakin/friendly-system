@@ -69,6 +69,7 @@ export default function FtthRow({ obj }: FtthRowProps) {
 
     async function fetchCpeSignal() {
         setFetchOnuSignalStatus(FetchRunning);
+        setSignalNow(null);
 
         try {
             const { data }: { data: SignalNow | any } = await api.get('cpe/txrx/actual/' + obj.erp_cpe_id);
@@ -79,7 +80,7 @@ export default function FtthRow({ obj }: FtthRowProps) {
                 });
             } else {
                 setSignalNow(data);
-                setFetchOnuSignalStatus(FetchRunning);
+                setFetchOnuSignalStatus(FetchSuccessful);
             }
         } catch (error: any) {
             const handledError = axiosErrorHandler(error);
@@ -153,7 +154,7 @@ export default function FtthRow({ obj }: FtthRowProps) {
                                 {
                                     fetchOnuSignalStatus.status === FetchStatus.FAILED ? <p>{fetchOnuSignalStatus.message}</p> :
                                         fetchOnuSignalStatus.status === FetchStatus.LOADING ? <CircularProgress /> :
-                                            (fetchOnuSignalHistoryStatus.status === FetchStatus.SUCCESS && signalNow) &&
+                                            (fetchOnuSignalStatus.status === FetchStatus.SUCCESS && signalNow) &&
                                             <div>
                                                 <p>{format(signalNow.date, "dd/MM HH:mm")}</p>
                                                 <p>Rx: {signalNow.rx}db</p>
