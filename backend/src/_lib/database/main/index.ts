@@ -41,11 +41,12 @@ export const CtoRxAverage = CtoRxAverageFactory(database);
 export const CtoTxAverage = CtoTxAverageFactory(database);
 
 // Users have skills then lets create that relationship
-User.addHook('beforeSave', async (user: UserModel) => {
+User.addHook('beforeCreate', 'password_hash', async (user: UserModel) => {
     if (user.password) {
         user.password_hash = await bcrypt.hash(user.password, 8);
     }
 });
+
 //User.hasMay(Skills);
 GponCount.belongsTo(GponIntegration, {
     as: "GponIntegration"

@@ -14,6 +14,7 @@ import GponRxAverageController from './controllers/Gpon/GponRxAverageController'
 import CtoCountController from './controllers/Cto/CtoCountController';
 import CtoRxAverageController from './controllers/Cto/CtoRxAverageController';
 import CtoTxAverageController from './controllers/Cto/CtoTxAverageController';
+import UserController from './controllers/User/UserController';
 
 const routes = Router();
 
@@ -32,6 +33,8 @@ routes.use(SessionValidatorMiddleware);
  */
 
 routes.delete('/sessions', SessionController.delete);
+routes.post('/user', UserController.store)
+
 routes.get('/phone_subscriber', PhoneSubscriberController.index);
 
 routes.get('/cto/count/:ap_id', CtoCountController.index);

@@ -5,6 +5,7 @@ import {
 } from "react-router-dom";
 
 import NotFound404Page from "../pages/misc/NotFound404Page";
+import CreateUserPage from "../pages/private/CreateUserPage/CreateUserPage";
 import FtthPage from "../pages/private/FtthPage/FtthPage";
 import GponPage from "../pages/private/GponPage/GponPage";
 import PhoneSubscriberPage from "../pages/private/PhoneSubscriberPage/PhoneSubscriberPage";
@@ -20,6 +21,7 @@ export default function AppRoutes() {
                 <Route path="/gpon" element={<GponPage />} />
                 <Route path="/ftth" element={<FtthPage />} />
                 <Route path="/phone_subscriber" element={<PhoneSubscriberPage />} />
+                <Route path="/create_user" element={<CreateUserPage />} />
             </Route>
             <Route path="*" element={<NotFound404Page />} />
         </Routes>

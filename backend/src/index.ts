@@ -11,6 +11,12 @@ try {
                 `Started listening on ${appConfig.DEVELOPMENT_PORT}/http at ${new Date()} in ${appConfig.NODE_ENV} mode`
             ));
         });
+    } else {
+        app.listen(appConfig.PRODUCTION_PORT, () => {
+            console.log(chalk.green.bold(
+                `Started listening on ${appConfig.PRODUCTION_PORT}/http at ${new Date()} in ${appConfig.NODE_ENV} mode`
+            ));
+        });
     }
 } catch (err) {
     console.log(chalk.red.bold(
