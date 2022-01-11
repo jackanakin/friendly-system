@@ -17,7 +17,7 @@ import { LoadingPage } from '../../../components/LoadingPage/LoadingPage';
 import { ErrorPage } from '../../../components/ErrorPage/ErrorPage';
 import { LoadingComponent } from '../../../components/LoadingComponent/LoadingComponent';
 import { ErrorComponent } from '../../../components/ErrorComponent/ErrorComponent';
-import GponGraphDTO from '../../../@types/models/gpon/GponGraphDTO';
+import GponGraphDTO, { CardKeys } from '../../../@types/models/gpon/GponGraphDTO';
 import { FetchIdle, FetchRunning, FetchSuccessful } from '../../../@dto/api/FetchStatus';
 import AxiosFetch from '../../../@types/api/AxiosFetch';
 import { fetchApList } from './fun/fetchGponApList';
@@ -33,6 +33,7 @@ export default function GponPage() {
     const [fetchApStatus, setFetchApStatus] = useState<AxiosFetch>(FetchRunning);
 
     const [gponCountData, setGponCountData] = useState<GponGraphDTO | null>(null);
+    const [cardKeys, setCardKeys] = useState<CardKeys[]>([]);
     const [fetchGponCountDataStatus, setFetchGponCountDataStatus] = useState<AxiosFetch>(FetchIdle);
     const [gponTxAverageData, setGponTxAverageData] = useState<GponGraphDTO | null>(null);
     const [fetchGponTxAverageStatus, setFetchGponTxAverageStatus] = useState<AxiosFetch>(FetchIdle);
@@ -85,7 +86,25 @@ export default function GponPage() {
     }, []);
     const resolveGponCount = useCallback((data: GponGraphDTO) => {
         setGponCountData(data);
+
         if (data && data.data.length > 0) {
+            const cardList: CardKeys[] = [];
+            data.keys.forEach(key => {
+                const cardName = key.split('/')[0].replace('PON', 'CARD');
+                const added = cardList.find(x => x.name === cardName);
+
+                if (added) {
+                    added.ponList.push({
+                        name: key, color: `#${Math.floor(Math.random() * 16777215).toString(16)}`
+                    });
+                }
+                else {
+                    const newCard = { name: cardName, ponList: [{ name: key, color: `#${Math.floor(Math.random() * 16777215).toString(16)}` }] } as CardKeys;
+                    cardList.push(newCard);
+                }
+            });
+
+            setCardKeys(cardList);
             setFetchGponCountDataStatus(FetchSuccessful);
         } else {
             setFetchGponCountDataStatus({
@@ -182,71 +201,74 @@ export default function GponPage() {
                             </div>
                         </HorizontalWrapper>
 
-                        <HorizontalWrapper>
-                            <Typography>PON</Typography>
-                            <VerticalWrapper>
-                                <Typography>Online</Typography>
-                                {(fetchGponCountDataStatus.status === FetchStatus.FAILED || fetchGponCountDataStatus.status === FetchStatus.EMPTY) ? <ErrorComponent text={fetchGponCountDataStatus.message} /> :
-                                    fetchGponCountDataStatus.status === FetchStatus.LOADING ? <LoadingComponent /> :
-                                        (fetchGponCountDataStatus.status === FetchStatus.SUCCESS && gponCountData) &&
-                                        <LineChart width={800} height={200} data={gponCountData.data}>
-                                            <Tooltip />
-                                            <XAxis dataKey="date" />
-                                            <YAxis type="number" />
+                        {
+                            cardKeys.map((card, index) =>
+                                <HorizontalWrapper key={index}>
+                                    <Typography>{card.name}</Typography>
+                                    <VerticalWrapper>
+                                        <Typography>Online</Typography>
+                                        {(fetchGponCountDataStatus.status === FetchStatus.FAILED || fetchGponCountDataStatus.status === FetchStatus.EMPTY) ? <ErrorComponent text={fetchGponCountDataStatus.message} /> :
+                                            fetchGponCountDataStatus.status === FetchStatus.LOADING ? <LoadingComponent /> :
+                                                (fetchGponCountDataStatus.status === FetchStatus.SUCCESS && gponCountData) &&
+                                                <LineChart width={800} height={200} data={gponCountData.data}>
+                                                    <Tooltip />
+                                                    <XAxis dataKey="date" />
+                                                    <YAxis type="number" />
 
-                                            {
-                                                gponCountData.keys.map((datakey, index) =>
-                                                    <Line key={index} type="monotone" strokeWidth={2} dataKey={datakey} stroke={`#${Math.floor(Math.random() * 16777215).toString(16)}`} textAnchor={datakey} />)
-                                            }
+                                                    {
+                                                        card.ponList.map((pon, index) =>
+                                                            <Line key={index} type="monotone" strokeWidth={2} dataKey={pon.name} stroke={pon.color} textAnchor={pon.name} />)
+                                                    }
 
-                                            <Legend />
-                                            <CartesianGrid stroke="#ccc" />
-                                        </LineChart>
-                                }
-                            </VerticalWrapper>
+                                                    <Legend />
+                                                    <CartesianGrid stroke="#ccc" />
+                                                </LineChart>
+                                        }
+                                    </VerticalWrapper>
 
-                            <VerticalWrapper>
-                                <Typography>Rx avg.</Typography>
-                                {(fetchGponRxAverageStatus.status === FetchStatus.FAILED || fetchGponRxAverageStatus.status === FetchStatus.EMPTY) ? <ErrorComponent text={fetchGponRxAverageStatus.message} /> :
-                                    fetchGponRxAverageStatus.status === FetchStatus.LOADING ? <LoadingComponent /> :
-                                        (fetchGponRxAverageStatus.status === FetchStatus.SUCCESS && gponRxAverageData) &&
-                                        <LineChart width={800} height={200} data={gponRxAverageData.data}>
-                                            <Tooltip />
-                                            <XAxis dataKey="date" />
-                                            <YAxis type="number" />
+                                    <VerticalWrapper>
+                                        <Typography>Rx avg.</Typography>
+                                        {(fetchGponRxAverageStatus.status === FetchStatus.FAILED || fetchGponRxAverageStatus.status === FetchStatus.EMPTY) ? <ErrorComponent text={fetchGponRxAverageStatus.message} /> :
+                                            fetchGponRxAverageStatus.status === FetchStatus.LOADING ? <LoadingComponent /> :
+                                                (fetchGponRxAverageStatus.status === FetchStatus.SUCCESS && gponRxAverageData) &&
+                                                <LineChart width={800} height={200} data={gponRxAverageData.data}>
+                                                    <Tooltip />
+                                                    <XAxis dataKey="date" />
+                                                    <YAxis type="number" />
 
-                                            {
-                                                gponRxAverageData.keys.map((datakey, index) =>
-                                                    <Line key={index} type="monotone" dataKey={datakey} strokeWidth={2} stroke={`#${Math.floor(Math.random() * 16777215).toString(16)}`} textAnchor={datakey} />)
-                                            }
+                                                    {
+                                                        card.ponList.map((pon, index) =>
+                                                            <Line key={index} type="monotone" strokeWidth={2} dataKey={pon.name} stroke={pon.color} textAnchor={pon.name} />)
+                                                    }
 
-                                            <Legend />
-                                            <CartesianGrid stroke="#ccc" />
-                                        </LineChart>
-                                }
-                            </VerticalWrapper>
+                                                    <Legend />
+                                                    <CartesianGrid stroke="#ccc" />
+                                                </LineChart>
+                                        }
+                                    </VerticalWrapper>
 
-                            <VerticalWrapper>
-                                <Typography>Tx avg.</Typography>
-                                {(fetchGponTxAverageStatus.status === FetchStatus.FAILED || fetchGponTxAverageStatus.status === FetchStatus.EMPTY) ? <ErrorComponent text={fetchGponTxAverageStatus.message} /> :
-                                    fetchGponTxAverageStatus.status === FetchStatus.LOADING ? <LoadingComponent /> :
-                                        (fetchGponTxAverageStatus.status === FetchStatus.SUCCESS && gponTxAverageData) &&
-                                        <LineChart width={800} height={200} data={gponTxAverageData.data}>
-                                            <Tooltip />
-                                            <XAxis dataKey="date" />
-                                            <YAxis type="number" />
+                                    <VerticalWrapper>
+                                        <Typography>Tx avg.</Typography>
+                                        {(fetchGponTxAverageStatus.status === FetchStatus.FAILED || fetchGponTxAverageStatus.status === FetchStatus.EMPTY) ? <ErrorComponent text={fetchGponTxAverageStatus.message} /> :
+                                            fetchGponTxAverageStatus.status === FetchStatus.LOADING ? <LoadingComponent /> :
+                                                (fetchGponTxAverageStatus.status === FetchStatus.SUCCESS && gponTxAverageData) &&
+                                                <LineChart width={800} height={200} data={gponTxAverageData.data}>
+                                                    <Tooltip />
+                                                    <XAxis dataKey="date" />
+                                                    <YAxis type="number" />
 
-                                            {
-                                                gponTxAverageData.keys.map((datakey, index) =>
-                                                    <Line key={index} type="monotone" dataKey={datakey} strokeWidth={2} stroke={`#${Math.floor(Math.random() * 16777215).toString(16)}`} textAnchor={datakey} />)
-                                            }
+                                                    {
+                                                        card.ponList.map((pon, index) =>
+                                                            <Line key={index} type="monotone" strokeWidth={2} dataKey={pon.name} stroke={pon.color} textAnchor={pon.name} />)
+                                                    }
 
-                                            <Legend />
-                                            <CartesianGrid stroke="#ccc" />
-                                        </LineChart>
-                                }
-                            </VerticalWrapper>
-                        </HorizontalWrapper>
+                                                    <Legend />
+                                                    <CartesianGrid stroke="#ccc" />
+                                                </LineChart>
+                                        }
+                                    </VerticalWrapper>
+                                </HorizontalWrapper>
+                            )}
 
                         {
                             ctoCountData.map((ctoCount, index) =>

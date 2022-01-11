@@ -4,6 +4,7 @@ import { Op } from "sequelize";
 import { Ap, CtoCount, GponIntegration } from "../../../_lib/database/main";
 import CtoGraphDTO, { CtoGraphValues } from "../../@dto/cto/CtoGraphDTO";
 import { internalErrorHandler } from "../../@exceptions/_handler/InternalErrorHandler";
+import { ctoGraphDTOSorter } from "../../utils/sorter/CtoGraphDTOSorter";
 import { aplhanumericalSorter } from "../../utils/sorter/IntlCollatorSorters";
 
 class CtoCountController {
@@ -99,7 +100,8 @@ class CtoCountController {
                 dto.keys = dto.keys.sort(aplhanumericalSorter.compare)
             });
 
-            return res.json(result);
+            const sortResult = result.sort(ctoGraphDTOSorter);
+            return res.json(sortResult);
         } catch (error) {
             return internalErrorHandler(error, res);
         }
