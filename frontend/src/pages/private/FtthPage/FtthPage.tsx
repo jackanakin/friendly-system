@@ -30,6 +30,7 @@ import AxiosFetch from '../../../@types/api/AxiosFetch';
 import { usePromise } from '../../../hooks/@promises/usePromise';
 import { fetchCpeList, FetchCpeListResponse } from './fun/fetchFtthCpeList';
 import { fetchApList } from './fun/fetchFtthApList';
+import { sortLastSoftwareVersion, sortName, sortNap } from '../../../utils/sorter/FtthPageSorters';
 
 export default function FtthPage() {
     const { promise } = usePromise();
@@ -155,6 +156,30 @@ export default function FtthPage() {
         setCpeList(newResult);
     };
 
+    function handleNameSort() {
+        if (cpeList.length <= 0) return;
+
+        let sorted = cpeList.slice().sort(sortName);
+
+        setCpeList(sorted);
+    }
+
+    function handleLastSoftwareVersionSort() {
+        if (cpeList.length <= 0) return;
+
+        let sorted = cpeList.slice().sort(sortLastSoftwareVersion);
+
+        setCpeList(sorted);
+    }
+
+    function handleNapSort() {
+        if (cpeList.length <= 0) return;
+
+        let sorted = cpeList.slice().sort(sortNap);
+
+        setCpeList(sorted);
+    }
+
     return (
         <AppBackground>
             {fetchApStatus.status === FetchStatus.LOADING ?
@@ -251,12 +276,12 @@ export default function FtthPage() {
                                                         <TableHead>
                                                             <TableRowHeader>
                                                                 <TableCell align="left" />
-                                                                <TableCell id="name" align="left">Nome</TableCell>
+                                                                <TableCell onClick={handleNameSort} id="name" align="left">Nome</TableCell>
                                                                 <TableCell id="username" align="left">Username</TableCell>
                                                                 <TableCell id="onu_serial" align="left">Serial</TableCell>
-                                                                <TableCell id="nap" align="left" >CTO/Porta</TableCell>
+                                                                <TableCell onClick={handleNapSort} id="nap" align="left" >CTO/Porta</TableCell>
                                                                 <TableCell id="last_rx" align="left" >RX/TX</TableCell>
-                                                                <TableCell id="last_software_version" align="left" >Fw. Version</TableCell>
+                                                                <TableCell onClick={handleLastSoftwareVersionSort} id="last_software_version" align="left" >Fw. Version</TableCell>
                                                                 <TableCell id="last_pon_index" align="left" >PON Index</TableCell>
                                                                 <TableCell id="last_online" align="left" >Última vista</TableCell>
                                                             </TableRowHeader>
