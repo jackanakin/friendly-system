@@ -1,5 +1,5 @@
 # friendly-system
-<p>Integrate MK ERP with Fiberhome OLT's using SNMP for ONU's signal and online counters</p>
+<p>Integrate ERP Mk Solutions through SQL with Fiberhome OLT's vendor using SNMP for ONU's signal and online counters</p>
 <p>Features</p>
 
 - [x] Average signal (TX and RX) for PON and CTO (Optical Termination Box)
@@ -25,5 +25,9 @@ data-canonical-src="https://github.com/jackanakin/friendly-system/blob/main/scre
 <img src="https://github.com/jackanakin/friendly-system/blob/main/screenshots/gpon.png" 
 data-canonical-src="https://github.com/jackanakin/friendly-system/blob/main/screenshots/gpon.png" width="860" height="520" />
 
-<p>ap table must be populated manually, ex:</p>
-<p>insert into ap values (default,	111, 'ANY-OLT-01-01', '1.3.6.1.4.1.5875.800.3.10.1.1.10', '5875.800.3.10.1.1.10', '127.0.0.1', 1, 2, 161, 'snmp_community', true);</p>
+### 🛠 Tech stacks used
+- [Python](https://www.python.org/)
+- [Node.js](https://nodejs.org/en/)
+- [React](https://reactjs.org/)
+- [MUI](https://mui.com/)
+- [Recharts](https://recharts.org/en-US/)
