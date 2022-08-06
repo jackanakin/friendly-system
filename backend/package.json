@@ -1,9 +1,9 @@
 {
-  "name": "friendly-system-backend",
+  "name": "fs-backend",
+  "license": "Copyright © 2021 Jardel Kuhn (jackanakin) jardelkuhn@gmail.com",
   "version": "1.0.0",
   "main": "dist/index.js",
   "homepage": "https://github.com/jackanakin/friendly-system",
-  "license": "SEE LICENSE IN LICENSE.md",
   "scripts": {
     "dev": "nodemon src/index.ts",
     "start": "node dist/app-server.js",

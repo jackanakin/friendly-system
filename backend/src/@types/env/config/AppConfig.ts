@@ -5,7 +5,6 @@ export default interface AppConfig {
     PYTHON_URL: string;
     NODE_ENV: string;
     APP_SECRET: string;
-    DEVELOPMENT_PORT: string;
-    PRODUCTION_PORT: string;
+    PORT: string;
     CREATE_USER_ENABLED: TrueFalseEnum;
 }
