@@ -7,26 +7,26 @@ try:
 except ImportError:
     import json
 
-import app._services.integration.fiberhome.FiberhomeSingleOnuRxTxService as FiberhomeSingleOnuRxTxService
-from app._models.bra_admin.Ap import Ap
-from app._models.bra_admin.Cpe import Cpe
+import app.services.integration.fiberhome.FiberhomeSingleOnuRxTxService as FiberhomeSingleOnuRxTxService
+from app.models.Ap import Ap
+from app.models.Cpe import Cpe
 
-import app._models.bra_admin.gpon.AuthOnuList
-import app._models.bra_admin.gpon.CtoCount
-import app._models.bra_admin.gpon.CtoRxAverage
-import app._models.bra_admin.gpon.CtoTxAverage
-import app._models.bra_admin.gpon.GponCount
-import app._models.bra_admin.gpon.GponRxAverage
-import app._models.bra_admin.gpon.GponTxAverage
-import app._models.bra_admin.gpon.GponUnauthorized
-import app._models.bra_admin.gpon.OnuPonInfo
-import app._models.bra_admin.GponIntegration
-import app._models.bra_admin.PhoneSubscriber
-import app._models.bra_admin.PhonePrefixCity
-import app._models.bra_admin.gpon.PortInfoTable
-import app._models.bra_admin.gpon.PotsUserCfgList
-import app._models.bra_admin.Users
-import app._models.bra_admin.gpon.WanService
+import app.models.gpon.AuthOnuList
+import app.models.gpon.CtoCount
+import app.models.gpon.CtoRxAverage
+import app.models.gpon.CtoTxAverage
+import app.models.gpon.GponCount
+import app.models.gpon.GponRxAverage
+import app.models.gpon.GponTxAverage
+import app.models.gpon.GponUnauthorized
+import app.models.gpon.OnuPonInfo
+import app.models.GponIntegration
+import app.models.PhoneSubscriber
+import app.models.PhonePrefixCity
+import app.models.gpon.PortInfoTable
+import app.models.gpon.PotsUserCfgList
+import app.models.Users
+import app.models.gpon.WanService
 
 def get_one_signal_by_snmp_id(request):
     x_forwarded_for = request.META.get('HTTP_X_FORWARDED_FOR')

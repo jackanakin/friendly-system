@@ -1,7 +1,7 @@
 import datetime
 
-from app._constants.OID_FiberHome import OID_FiberHome
-import app._services.snmp.GetOIDService as GetOIDService
+from app.constants.oids.OID_FiberHome import OID_FiberHome
+import app.services.snmp.GetOIDService as GetOIDService
 
 def run(ap, snpm_id):
     date = datetime.datetime.now()

@@ -1,7 +1,7 @@
 from typing import List
-from app._constants.OID_FiberHome_OnuPonInfoEntry import OID_FiberHome_OnuPonInfoEntry
-from app._models.bra_admin.gpon.OnuPonInfo import OnuPonInfo
-import app._services.snmp.GetBulkService as GetBulkService
+from app.constants.oids.OID_FiberHome_OnuPonInfoEntry import OID_FiberHome_OnuPonInfoEntry
+from app.models.gpon.OnuPonInfo import OnuPonInfo
+import app.services.snmp.GetBulkService as GetBulkService
 
 def run(ap):
     onu_pon_info_list: List[OnuPonInfo] = []

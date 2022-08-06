@@ -1,6 +1,6 @@
 from datetime import datetime
 from django.db import connections
-from app._models.bra_admin.Cpe import Cpe
+from app.models.Cpe import Cpe
 
 def run():
     try:

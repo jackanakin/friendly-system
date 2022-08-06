@@ -1,7 +1,7 @@
 from typing import List
-from app._constants.OID_FiberHome_PortInfoTableEntry import OID_FiberHome_PortInfoTableEntry
-from app._models.bra_admin.gpon.PortInfoTable import PortInfoTable
-import app._services.snmp.GetBulkService as GetBulkService
+from app.constants.oids.OID_FiberHome_PortInfoTableEntry import OID_FiberHome_PortInfoTableEntry
+from app.models.gpon.PortInfoTable import PortInfoTable
+import app.services.snmp.GetBulkService as GetBulkService
 
 def run(ap):
     port_info_list: List[PortInfoTable] = []

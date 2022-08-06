@@ -1,7 +1,7 @@
 from typing import List
-from app._constants.OID_FiberHome_WanServiceEntry import OID_FiberHome_WanServiceEntry
-from app._models.bra_admin.gpon.WanService import WanService
-import app._services.snmp.GetBulkService as GetBulkService
+from app.constants.oids.OID_FiberHome_WanServiceEntry import OID_FiberHome_WanServiceEntry
+from app.models.gpon.WanService import WanService
+import app.services.snmp.GetBulkService as GetBulkService
 
 def run(ap):
     wan_service_list: List[WanService] = []

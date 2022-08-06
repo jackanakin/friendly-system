@@ -1,7 +1,7 @@
 from datetime import datetime
 from django.db import connections
-from app._models.bra_admin.PhoneSubscriber import PhoneSubscriber
-from app._models.bra_admin.PhonePrefixCity import PhonePrefixCity
+from app.models.PhoneSubscriber import PhoneSubscriber
+from app.models.PhonePrefixCity import PhonePrefixCity
 
 def run():
     try:

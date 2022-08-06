@@ -5,10 +5,10 @@ try:
 except ImportError:
     import json
 
-from app._models.bra_admin.Ap import Ap
-from app._models.bra_admin.Cpe import Cpe
-from app._models.bra_admin.GponIntegration import GponIntegration
-import app._services.integration.fiberhome.FiberhomeSnmpExtractorService as FiberhomeSnmpExtractorService
+from app.models.Ap import Ap
+from app.models.Cpe import Cpe
+from app.models.GponIntegration import GponIntegration
+import app.services.integration.fiberhome.FiberhomeSnmpExtractorService as FiberhomeSnmpExtractorService
 
 def run():
     fiberhome_olt_list: List[Ap] = Ap.objects.all().filter(enabled=True)

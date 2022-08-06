@@ -1,7 +1,7 @@
 from typing import List
-from app._constants.OID_FiberHome_PotsUserCfgEntry import OID_FiberHome_PotsUserCfgEntry
-from app._models.bra_admin.gpon.PotsUserCfgList import PotsUserCfgList
-import app._services.snmp.GetBulkService as GetBulkService
+from app.constants.oids.OID_FiberHome_PotsUserCfgEntry import OID_FiberHome_PotsUserCfgEntry
+from app.models.gpon.PotsUserCfgList import PotsUserCfgList
+import app.services.snmp.GetBulkService as GetBulkService
 
 def run(ap):
     pots_user_cfg_list: List[PotsUserCfgList] = []

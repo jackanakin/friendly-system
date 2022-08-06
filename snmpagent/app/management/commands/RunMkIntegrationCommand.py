@@ -1,5 +1,5 @@
 from django.core.management.base import BaseCommand, CommandError
-import app._services.integration.MkIntegrationService as MkIntegrationService
+import app.services.integration.MkIntegrationService as MkIntegrationService
 
 class Command(BaseCommand):
 

@@ -1,5 +1,5 @@
 from django.db import models
-from app._models.bra_admin.Ap import Ap
+from app.models.Ap import Ap
 
 class GponRxAverage(models.Model):
     description = models.CharField(max_length=100)

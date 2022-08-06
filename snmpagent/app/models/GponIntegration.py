@@ -1,5 +1,5 @@
 from django.db import models
-from app._models.bra_admin.Ap import Ap
+from app.models.Ap import Ap
 
 class GponIntegration(models.Model):
     datetime = models.DateTimeField(auto_now_add=False, null=False)

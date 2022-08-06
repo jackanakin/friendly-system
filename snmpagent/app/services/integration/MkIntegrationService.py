@@ -5,8 +5,8 @@ try:
 except ImportError:
     import json
 
-import app._services.integration.mk.MkCpeIntegrationService as MkCpeIntegrationService
-import app._services.integration.mk.MkPhoneSubscriberIntegrationService as MkPhoneSubscriberIntegrationService
+import app.services.integration.mk.MkCpeIntegrationService as MkCpeIntegrationService
+import app.services.integration.mk.MkPhoneSubscriberIntegrationService as MkPhoneSubscriberIntegrationService
 
 
 def run():

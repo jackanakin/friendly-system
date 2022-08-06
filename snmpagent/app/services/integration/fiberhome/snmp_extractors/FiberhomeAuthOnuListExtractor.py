@@ -1,7 +1,7 @@
 from typing import List
-from app._constants.OID_FiberHome_AuthOnuListEntry import OID_FiberHome_AuthOnuListEntry
-from app._models.bra_admin.gpon.AuthOnuList import AuthOnuList
-import app._services.snmp.GetBulkService as GetBulkService
+from app.constants.oids.OID_FiberHome_AuthOnuListEntry import OID_FiberHome_AuthOnuListEntry
+from app.models.gpon.AuthOnuList import AuthOnuList
+import app.services.snmp.GetBulkService as GetBulkService
 
 def run(ap):
     auth_onu_list: List[AuthOnuList] = []
