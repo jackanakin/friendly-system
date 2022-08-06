@@ -41,7 +41,8 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
             const parse = JSON.parse(userCookie) as User;
             setUser(parse);
 
-            const from = location.state?.from?.pathname || "/";
+            //const from = location?.state?.from?.pathname || "/";
+            const from = (location as any).state?.from?.pathname || "/"; 
             navigate(from, { replace: true });
         } else {
             console.log("auth ok but userCookie empty");

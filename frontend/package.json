@@ -1,7 +1,7 @@
 {
-  "name": "friendly-system-frontend",
+  "name": "fs-frontend",
   "homepage": "http://127.0.0.1",
-  "license": "SEE LICENSE IN LICENSE.md",
+  "license": "Copyright © 2021 Jardel Kuhn (jackanakin) jardelkuhn@gmail.com",
   "version": "0.1.0",
   "private": true,
   "author": {
@@ -36,6 +36,10 @@
     "web-vitals": "^1.0.1",
     "yup": "^0.32.11"
   },
+  "devDependencies": {
+    "@types/js-cookie": "^3.0.1",
+    "@types/styled-components": "^5.1.15"
+  },
   "scripts": {
     "start": "react-scripts start",
     "build": "react-scripts build",
@@ -59,9 +63,5 @@
       "last 1 firefox version",
       "last 1 safari version"
     ]
-  },
-  "devDependencies": {
-    "@types/js-cookie": "^3.0.1",
-    "@types/styled-components": "^5.1.15"
   }
 }
