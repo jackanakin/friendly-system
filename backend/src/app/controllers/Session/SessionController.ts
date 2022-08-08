@@ -1,4 +1,4 @@
-import { Request, Response } from "express";
+import { CookieOptions, Request, Response } from "express";
 import jsonwebtoken from 'jsonwebtoken';
 import * as Yup from 'yup';
 import bcrypt from 'bcryptjs';
@@ -30,7 +30,7 @@ class SessionController {
         try {
             const schema = Yup.object().shape({
                 email: Yup.string()
-                    .email()
+                    //.email()
                     .required(),
                 password: Yup.string().required(),
             });
@@ -68,16 +68,14 @@ class SessionController {
 
             const maxAge = 1000 * 60 * 60 * 24;
 
-            res.cookie('token', tokens, {
-                maxAge,
-                httpOnly: true,
-                sameSite: true,
-            });
+            const cookieOptions = {
+                maxAge, 
+                sameSite: process.env.NODE_ENV === "production" ? 'none' : 'lax', // must be 'none' to enable cross-site delivery
+                secure: process.env.NODE_ENV === "production", // must be true if sameSite='none'
+            } as CookieOptions;
 
-            res.cookie('user', JSON.stringify({ name, email }), {
-                maxAge,
-                sameSite: true,
-            });
+            res.cookie('token', tokens, cookieOptions);
+            res.cookie('user', JSON.stringify({ name, email }), cookieOptions);
 
             return res.status(200).send();
         } catch (error) {

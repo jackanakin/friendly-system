@@ -25,7 +25,6 @@ class UserController {
             });
 
             if (!(await schema.isValid(req.body))) {
-                console.log("aquii")
                 return res.status(400).json({ error: 'Erro de validação' });
             }
 
