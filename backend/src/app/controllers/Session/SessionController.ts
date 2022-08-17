@@ -9,23 +9,6 @@ import { internalErrorHandler } from "../../@exceptions/_handler/InternalErrorHa
 import SessionControllerErrors from "../../@messages/controllers/Session/SessionControllerErrors";
 
 class SessionController {
-    async delete(req: Request, res: Response) {
-        try {
-            res.clearCookie('token', {
-                httpOnly: true,
-                sameSite: true,
-            });
-
-            res.clearCookie('user', {
-                sameSite: true,
-            });
-
-            return res.status(200).send();
-        } catch (error) {
-            return internalErrorHandler(error, res);
-        }
-    }
-
     async store(req: Request, res: Response) {
         try {
             const schema = Yup.object().shape({

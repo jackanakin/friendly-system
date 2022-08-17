@@ -72,12 +72,9 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     }
 
     async function signout() {
-        try {
-            await api.delete(`sessions`);
-        } catch (err) {
-            console.log("signout exception");
-            //toast error
-        }
+        (api.defaults.headers as any).Authorization = null;
+        localStorage.removeItem("user");
+        localStorage.removeItem("token");
         setUser(null);
     };
 

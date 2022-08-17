@@ -32,7 +32,6 @@ routes.use(SessionValidatorMiddleware);
  * Authenticated routes only
  */
 
-routes.delete('/sessions', SessionController.delete);
 routes.post('/user', UserController.store)
 
 routes.get('/phone_subscriber', PhoneSubscriberController.index);
