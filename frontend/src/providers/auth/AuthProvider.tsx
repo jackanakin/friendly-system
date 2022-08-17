@@ -1,12 +1,11 @@
-import Cookies from "js-cookie";
 import * as React from "react";
 import { useState } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
 import { FetchIdle, FetchRunning } from "../../@dto/api/FetchStatus";
 import { FetchStatus } from "../../@enum/api/FetchStatus";
 import AxiosFetch from "../../@types/api/AxiosFetch";
+import { SignInDTO, SignInResponseDTO } from "../../@types/models/user/SignInDTO";
 
-import SignInDTO from "../../@types/models/user/SignInDTO";
 import User from "../../@types/models/user/User";
 import api from "../../api/api";
 import { usePromise } from "../../hooks/@promises/usePromise";
@@ -28,21 +27,28 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     const location = useLocation();
     const navigate = useNavigate();
 
-    const userCookie = Cookies.get("user");
-    const storedUser = userCookie ? JSON.parse(userCookie) as User : null
+    const userStorage = localStorage.getItem("user");
+    const storedUser = userStorage ? JSON.parse(userStorage) as User : null;
+
+    const tokenStorage = localStorage.getItem("token");
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
+    const storedToken = tokenStorage ? ((api.defaults.headers as any).Authorization = `Bearer ${tokenStorage}`) : null;
 
     const [user, setUser] = React.useState<User | null>(storedUser);
     const [fetchLoginStatus, setFetchLoginStatus] = useState<AxiosFetch>(FetchIdle);
 
-    const resolveSignIn = () => {
-        const userCookie = Cookies.get("user");
+    const resolveSignIn = (response: SignInResponseDTO) => {
+        if (response) {
+            const { user, token } = response;
+            setUser(user);
 
-        if (userCookie) {
-            const parse = JSON.parse(userCookie) as User;
-            setUser(parse);
+            localStorage.setItem("user", JSON.stringify(user));
+            localStorage.setItem("token", token);
+
+            (api.defaults.headers as any).Authorization = `Bearer ${token}`;
 
             //const from = location?.state?.from?.pathname || "/";
-            const from = (location as any).state?.from?.pathname || "/"; 
+            const from = (location as any).state?.from?.pathname || "/";
             navigate(from, { replace: true });
         } else {
             console.log("auth ok but userCookie empty");

@@ -8,10 +8,13 @@ import { sessionErrorHandler } from "../@exceptions/_handler/SessionErrorHandler
 
 export default async (req: Request, res: Response, next: NextFunction) => {
     try {
-        const { token } = req.cookies;
-        if (!token) {
+        const authHeader = req.headers.authorization;
+
+        if (!authHeader) {
             return sessionErrorHandler("token not sent", res, req);
         }
+
+        const [, token] = authHeader.split(' ');
 
         try {
             const decoded = jwt.verify(token, authConfig.secret) as any;
@@ -22,6 +25,7 @@ export default async (req: Request, res: Response, next: NextFunction) => {
         } catch (err) {
             return sessionErrorHandler("token invalid", res, req);
         }
+
     } catch (error) {
         return internalErrorHandler(error, res);
     }
