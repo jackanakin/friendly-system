@@ -1,8 +1,6 @@
 import * as sequelize from "sequelize";
 import bcrypt from 'bcryptjs';
 
-import databaseConfig from '../../../_config/database/main';
-
 import { ApFactory } from "../../../app/models/Ap";
 import { CpeFactory } from "../../../app/models/Cpe";
 import { CpeRecordFactory } from "../../../app/models/CpeRecord";
@@ -18,7 +16,20 @@ import { CtoRxAverageFactory } from "../../../app/models/gpon/CtoRxAverage";
 import { CtoTxAverageFactory } from "../../../app/models/gpon/CtoTxAverage";
 
 export const database = new sequelize.Sequelize(
-    databaseConfig
+    {
+        dialect: 'postgres',
+        host: process.env.MAINDB_HOST,
+        port: process.env.MAINDB_PORT,
+        username: process.env.MAINDB_USER,
+        password: process.env.MAINDB_PASS,
+        database: process.env.MAINDB_NAME,
+        logging: false,
+        define: {
+            timestamp: true,
+            underscored: true,
+            underscoredAll: true,
+        },
+    } as any
 );
 
 // SOMETHING VERY IMPORTANT them Factory functions expect a

@@ -1,0 +1,19 @@
+version: '3'
+
+services:
+  database:
+    image: postgres:14.4
+    environment:
+      - POSTGRES_USER=postgres
+      - POSTGRES_PASSWORD=somestrongpassword
+      - POSTGRES_DB=friendly-system
+    networks:
+      - fs_network
+    volumes:
+      - fs_database:/var/lib/postgresql/data
+
+networks:
+  fs_network:
+
+volumes:
+  fs_database:
