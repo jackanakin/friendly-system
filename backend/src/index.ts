@@ -1,6 +1,6 @@
 import chalk from 'chalk';
 
-import app from './app';
+import app from './app/server';
 import appConfig from "./_config/app";
 
 try {
