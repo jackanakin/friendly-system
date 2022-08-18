@@ -42,13 +42,6 @@ export default function AppMenu() {
             </ListItemIcon>
             <ListItemText primary="FTTH" />
           </ListItem>
-
-          <ListItem component={Link} to="/phone_subscriber" button onClick={toggleMenu}>
-            <ListItemIcon>
-              <PhoneRounded />
-            </ListItemIcon>
-            <ListItemText primary="Telefonia" />
-          </ListItem>
         </List>
         <Divider />
       </div>

@@ -49,37 +49,12 @@ def run(ap: Ap, gpon_integration: GponIntegration, cpe_list: Dict[str, Cpe]):
             onu_pon_type=ponInfo.onu_pon_type, onu_pon_enable_status=ponInfo.onu_pon_enable_status, onu_pon_speed=ponInfo.onu_pon_speed, onu_pon_optical_vltage=ponInfo.onu_pon_optical_vltage,
             onu_pon_optical_current=ponInfo.onu_pon_optical_current, onu_pon_optical_temperature=ponInfo.onu_pon_optical_temperature, onu_pon_is_optical_power_valid=ponInfo.onu_pon_is_optical_power_valid,
             onu_pon_upstream_speed=ponInfo.onu_pon_upstream_speed)
-
-        """
-        for wan in wan_service_list:
-            onuIndex = int(cpeRecord.snmp_index)
-            subIndex = int(wan.onuPonIndex)
-            if (subIndex >= onuIndex and subIndex <= (onuIndex + 255)):
-                cpeRecord.wan_config = True
-                if cpeRecord.wan_conn_type:
-                    cpeRecord.wan_conn_type = cpeRecord.wan_conn_type + '#' + wan.wan_conn_type
-                    cpeRecord.wan_vlan_id = cpeRecord.wan_vlan_id + '#' + wan.wan_vlan_id
-                    cpeRecord.wan_nat_enable = cpeRecord.wan_nat_enable + '#' + wan.wan_nat_enable
-                    cpeRecord.wan_dsp = cpeRecord.wan_dsp + '#' + wan.wan_dsp
-                    cpeRecord.wan_pppoe_username = cpeRecord.wan_pppoe_username + '#' + wan.wan_pppoe_username
-                    cpeRecord.wan_pppoe_password = cpeRecord.wan_pppoe_password + '#' + wan.wan_pppoe_password
-                    cpeRecord.wan_vlan_mode = cpeRecord.wan_vlan_mode + '#' + wan.wan_vlan_mode
-                else:
-                    cpeRecord.wan_conn_type = wan.wan_conn_type
-                    cpeRecord.wan_vlan_id = wan.wan_vlan_id
-                    cpeRecord.wan_nat_enable = wan.wan_nat_enable
-                    cpeRecord.wan_dsp = wan.wan_dsp
-                    cpeRecord.wan_pppoe_username = wan.wan_pppoe_username
-                    cpeRecord.wan_pppoe_password = wan.wan_pppoe_password
-                    cpeRecord.wan_vlan_mode = wan.wan_vlan_mode
-        """
         
         for pots in onu_pots_user_cfg_list:
             onuIndex = int(cpeRecord.snmp_index)
             subIndex = int(pots.onuPonIndex)
             if (subIndex >= onuIndex and subIndex <= (onuIndex + 255)):
                 if (pots.pots_enable == '1'):
-                    #print("pots enable")
                     cpeRecord.pots_enable = True
                     cpeRecord.tel_num = pots.tel_num
                     cpeRecord.binding_signal_name = pots.binding_signal_name
