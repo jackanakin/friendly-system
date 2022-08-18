@@ -38,12 +38,6 @@ yargs.command({
 
         userInput.stdoutMuted = true;
         userInput.query = `Senha para ${email}:`;
-        userInput._writeToOutput = function _writeToOutput(stringToWrite: string) {
-            if (userInput.stdoutMuted)
-                userInput.output.write("*");
-            else
-                userInput.output.write(stringToWrite);
-        };
 
         userInput.question(userInput.query, async (password: string) => {
             const user = { name, email, password } as CreateUserDTO;
@@ -53,6 +47,13 @@ yargs.command({
 
             userInput.close();
         });
+
+        userInput._writeToOutput = function _writeToOutput(stringToWrite: string) {
+            if (userInput.stdoutMuted)
+                userInput.output.write("*");
+            else
+                userInput.output.write(stringToWrite);
+        };
     }
 });
 
