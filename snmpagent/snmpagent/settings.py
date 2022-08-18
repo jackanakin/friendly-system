@@ -33,6 +33,11 @@ print("Loading Enviroment Configuration File: " + config_file_path)
 
 # SECURITY WARNING: keep the secret key used in production secret!
 SECRET_KEY = config.get('system', 'SECRET_KEY')
+ERPDB_ADDRESS = config.get('ERPDB', 'HOST')
+ERPDB_PORT = config.get('ERPDB', 'PORT')
+ERPDB_USER = config.get('ERPDB', 'USER')
+ERPDB_PASSWORD = config.get('ERPDB', 'PASSWORD')
+ERPDB_DATABASE = config.get('ERPDB', 'NAME')
 
 # Application definition
 
@@ -71,14 +76,6 @@ DATABASES = {
         'PASSWORD': config.get('MAINDB', 'PASSWORD'),
         'HOST': config.get('MAINDB', 'HOST'),
         'PORT': config.get('MAINDB', 'PORT'),
-    },
-    'ERPDB': {
-        'ENGINE': config.get('ERPDB', 'ENGINE'),
-        'NAME': config.get('ERPDB', 'NAME'),
-        'USER': config.get('ERPDB', 'USER'),
-        'PASSWORD': config.get('ERPDB', 'PASSWORD'),
-        'HOST': config.get('ERPDB', 'HOST'),
-        'PORT': config.get('ERPDB', 'PORT'),
     }
 }
 
