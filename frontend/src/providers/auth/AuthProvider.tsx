@@ -1,7 +1,7 @@
 import * as React from "react";
 import { useState } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
-import { FetchIdle, FetchRunning } from "../../@dto/api/FetchStatus";
+import { FetchIdle, FetchRunning, FetchSuccessful } from "../../@dto/api/FetchStatus";
 import { FetchStatus } from "../../@enum/api/FetchStatus";
 import AxiosFetch from "../../@types/api/AxiosFetch";
 import { SignInDTO, SignInResponseDTO } from "../../@types/models/user/SignInDTO";
@@ -50,6 +50,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
             //const from = location?.state?.from?.pathname || "/";
             const from = (location as any).state?.from?.pathname || "/";
             navigate(from, { replace: true });
+            setFetchLoginStatus(FetchSuccessful);
         } else {
             console.log("auth ok but userCookie empty");
             //toast error
