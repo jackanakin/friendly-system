@@ -19,7 +19,15 @@ services:
     ports:
       - 80:80
     networks:
-        - fs_network
+      - fs_network
+  
+  app-api:
+    build:
+      context: ./backend
+    ports:
+      - 3333:3333
+    networks:
+      - fs_network
 
 networks:
   fs_network:
