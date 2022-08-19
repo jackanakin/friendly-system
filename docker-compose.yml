@@ -11,6 +11,15 @@ services:
       - fs_network
     volumes:
       - fs_database:/var/lib/postgresql/data
+    
+  app:
+    build:
+      context: ./frontend/
+      #dockerfile: Dockerfile
+    ports:
+      - 80:80
+    networks:
+        - fs_network
 
 networks:
   fs_network:
