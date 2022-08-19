@@ -10,6 +10,7 @@ import { internalErrorHandler } from "../../@exceptions/_handler/InternalErrorHa
 class UserController {
     async store(req: Request, res: Response) {
         try {
+            return res.status(400).json({ error: 'Create disabled' });
             if (appConfig.CREATE_USER_ENABLED !== TrueFalseEnum.true) {
                 return res.status(400).json({ error: 'Create disabled' });
             }

@@ -5,15 +5,18 @@
   "main": "dist/index.js",
   "homepage": "https://github.com/jackanakin/friendly-system",
   "scripts": {
-    "dev": "nodemon src/index.ts",
     "start": "node dist/app-server.js",
+
     "build": "tsc",
+    "build:run:migration": "sequelize db:migrate",
+    "build:admin:adduser": "node dist/app/admin.js adduser",
+    "build:admin:deluser": "node dist/app/admin.js deluser",
+
+    "dev": "nodemon src/index.ts",
     "new:migration": "npx sequelize-cli migration:generate --name",
     "run:migration": "npx sequelize-cli db:migrate",
-    "dev:admin:adduser": "nodemon src/app/admin.ts adduser",
-    "dev:admin:deluser": "nodemon src/app/admin.ts deluser",
-    "admin:adduser": "node dist/app/admin.ts adduser",
-    "admin:deluser": "node dist/app/admin.ts deluser"
+    "admin:adduser": "nodemon src/app/admin.ts adduser",
+    "admin:deluser": "nodemon src/app/admin.ts deluser"
   },
   "dependencies": {
     "axios": "^0.24.0",

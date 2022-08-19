@@ -6,14 +6,14 @@ WORKDIR /opt/app
 
 COPY src/ src/
 COPY @types/ @types/
-COPY package.json tsconfig.json .sequelizerc tslint.json .env.production .
-RUN mv .env.production .env
+COPY package.json tsconfig.json .sequelizerc tslint.json .
 
 RUN npm install
 RUN npm run build
 
+COPY .docker/entrypoint.sh .
+RUN ["chmod", "+x", "/opt/app/entrypoint.sh"]
+
 USER node
 
-EXPOSE 3333
-
-ENTRYPOINT ["node", "build/index.js"]
+ENTRYPOINT ["/opt/app/entrypoint.sh"]

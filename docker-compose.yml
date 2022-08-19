@@ -12,9 +12,11 @@ services:
     volumes:
       - fs_database:/var/lib/postgresql/data
     
-  app:
+  app-web:
     build:
       context: ./frontend/
+      args:
+        API_URL: http://192.168.42.12:3333
       #dockerfile: Dockerfile
     ports:
       - 80:80
@@ -24,6 +26,19 @@ services:
   app-api:
     build:
       context: ./backend
+    environment:
+      - WEB_URL=http://192.168.42.12
+      - PYTHON_URL=http://127.0.0.1:8000/snmpagent/
+      - APP_SECRET=mysecert123
+      - PORT=3333
+
+      - NODE_ENV=production
+
+      - MAINDB_HOST=database
+      - MAINDB_PORT=5432
+      - MAINDB_USER=postgres
+      - MAINDB_PASS=somestrongpassword
+      - MAINDB_NAME=friendly-system
     ports:
       - 3333:3333
     networks:

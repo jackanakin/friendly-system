@@ -1,5 +1,7 @@
 FROM nginx:1.23.1
 
+ARG API_URL
+
 # Nginx conf for ReactJS
 COPY .docker/nginx/default.conf /etc/nginx/conf.d
 
@@ -11,10 +13,10 @@ RUN apt-get install -y nodejs
 WORKDIR /opt/app
 COPY src/ src/
 COPY public/ public/
-COPY .env.development package.json tsconfig.json .
+COPY package.json tsconfig.json .
 RUN npm install --global yarn
 RUN yarn
-RUN yarn build
+RUN REACT_APP_API_URL=${API_URL} yarn build
 
 # Move builded app folder to nginx source
 RUN cp -R build/* /usr/share/nginx/html/
