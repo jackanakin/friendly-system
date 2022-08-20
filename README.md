@@ -1,5 +1,12 @@
 # friendly-system
 <p>Integrate ERP Mk Solutions through SQL with Fiberhome OLT's vendor using SNMP for ONU's signal and online counters</p>
+
+### 🛠 Tech stacks used
+- [x] Django
+- [x] Express
+- [x] ReactJS with [MUI](https://mui.com/) and [Recharts](https://recharts.org/en-US/)
+- [x] Docker
+
 <p>Features</p>
 
 - [x] Average signal (TX and RX) for PON and CTO (Optical Termination Box)
@@ -24,10 +31,3 @@ data-canonical-src="https://github.com/jackanakin/friendly-system/blob/main/scre
 <p>GPON page with average signal and counter for PON and CTO (Optical Termination Box):</p>
 <img src="https://github.com/jackanakin/friendly-system/blob/main/screenshots/gpon.png" 
 data-canonical-src="https://github.com/jackanakin/friendly-system/blob/main/screenshots/gpon.png" width="860" height="520" />
-
-### 🛠 Tech stacks used
-- [Python](https://www.python.org/)
-- [Node.js](https://nodejs.org/en/)
-- [React](https://reactjs.org/)
-- [MUI](https://mui.com/)
-- [Recharts](https://recharts.org/en-US/)
