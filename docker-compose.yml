@@ -1,25 +1,27 @@
 version: '3'
+# Set environment variables in .env or keep default fallback values
 
 services:
   database:
-    image: postgres:14.4
+    image: postgres:14.5-alpine
     environment:
-      - POSTGRES_USER=postgres
-      - POSTGRES_PASSWORD=somestrongpassword
-      - POSTGRES_DB=friendly-system
+      - POSTGRES_USER=${DB_USER:-postgres}
+      - POSTGRES_PASSWORD=${DB_PASS:-somestrongpassword}
+      - POSTGRES_DB=${DB_NAME:-friendly-system}
     networks:
       - fs_network
     volumes:
       - fs_database:/var/lib/postgresql/data
+      #- fs_database-development:/var/lib/postgresql/data
     
   app-web:
     build:
       context: ./frontend/
       args:
-        API_URL: http://192.168.42.12:3333
+        API_URL: ${API_URL:-localhost}:${API_PORT:-3333}
       #dockerfile: Dockerfile
     ports:
-      - 80:80
+      - ${WEB_PORT:-80}:80
     networks:
       - fs_network
   
@@ -27,20 +29,20 @@ services:
     build:
       context: ./backend
     environment:
-      - WEB_URL=http://192.168.42.12
-      - PYTHON_URL=http://127.0.0.1:8000/snmpagent/
-      - APP_SECRET=mysecert123
+      - WEB_URL=${WEB_URL:-localhost}
+      - PYTHON_URL=${SNMPAGENT_URL:-http://localhost:8000}/snmpagent/
+      - APP_SECRET=${API_SECRET:-mysecert123}
       - PORT=3333
 
       - NODE_ENV=production
 
-      - MAINDB_HOST=database
-      - MAINDB_PORT=5432
-      - MAINDB_USER=postgres
-      - MAINDB_PASS=somestrongpassword
-      - MAINDB_NAME=friendly-system
+      - MAINDB_HOST=${DB_ADDR:-database}
+      - MAINDB_PORT=${DB_PORT:-5432}
+      - MAINDB_USER=${DB_USER:-postgres}
+      - MAINDB_PASS=${DB_PASS:-somestrongpassword}
+      - MAINDB_NAME=${DB_NAME:-friendly-system}
     ports:
-      - 3333:3333
+      - ${API_PORT:-3333}:3333
     networks:
       - fs_network
 
@@ -49,3 +51,6 @@ networks:
 
 volumes:
   fs_database:
+  #fs_database-development: #attach development database
+    #name: 98e19309c2840ebc09b508bd33de99bbb4a2a3973a4195dbdafce68710103cb6
+    #external: true
