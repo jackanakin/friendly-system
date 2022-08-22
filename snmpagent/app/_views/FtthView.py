@@ -36,9 +36,7 @@ def get_one_signal_by_snmp_id(request):
     else:
         ip = request.META.get('REMOTE_ADDR')
 
-    if ip and ip != '127.0.0.1':
-        print("IP: " + ip + ' Not Authorized')
-        return HttpResponseNotFound()
+    print("FROM: " + ip)
 
     erp_cpe_id = request.GET.get('erp_cpe_id', '')
     erp_cpe_id = int(erp_cpe_id)

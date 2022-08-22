@@ -22,42 +22,48 @@ APP_DIR = pth = os.path.dirname(app.__file__)
 
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True
-#DEBUG = False
+PRODUCTION  = os.environ.get("PRODUCTION", default=False)
+DEBUG = not PRODUCTION
 
-# ENV FILE LOAD
+ALLOWED_HOSTS = ["0.0.0.0"]
+
+print("Started in {} mode".format("PRODUCTION" if PRODUCTION else "DEVELOPMENT"))
+
+# ENV FILE LOAD FOR DEVELOPMENT MODE
 config_file_path = os.path.join(BASE_DIR, 'settings.ini')
 config = configparser.RawConfigParser()
-config.read(config_file_path)
-print("Loading Enviroment Configuration File: " + config_file_path)
+
+if config_file_path != None:
+    print("Loading Enviroment Configuration File: " + config_file_path)
+    config.read(config_file_path)
+else:
+    print("Enviroment Configuration File NOT FOUND, skipping")
 
 # SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = config.get('system', 'SECRET_KEY')
-ERPDB_ADDRESS = config.get('ERPDB', 'HOST')
-ERPDB_PORT = config.get('ERPDB', 'PORT')
-ERPDB_USER = config.get('ERPDB', 'USER')
-ERPDB_PASSWORD = config.get('ERPDB', 'PASSWORD')
-ERPDB_DATABASE = config.get('ERPDB', 'NAME')
+SECRET_KEY = os.environ.get("SECRET_KEY", "secret key") if PRODUCTION else config.get('system', 'SECRET_KEY')
+ERPDB_ADDRESS = os.environ.get("ERPDB_ADDRESS", "127.0.0.1") if PRODUCTION else config.get('ERPDB', 'HOST')
+ERPDB_PORT = os.environ.get("ERPDB_PORT", 5432) if PRODUCTION else config.get('ERPDB', 'PORT')
+ERPDB_USER = os.environ.get("ERPDB_USER", "postgres") if PRODUCTION else config.get('ERPDB', 'USER')
+ERPDB_PASSWORD = os.environ.get("ERPDB_PASSWORD", "password") if PRODUCTION else config.get('ERPDB', 'PASSWORD')
+ERPDB_DATABASE = os.environ.get("ERPDB_DATABASE", "database") if PRODUCTION else config.get('ERPDB', 'NAME')
 
 # Application definition
 
 INSTALLED_APPS = [
-    'django.contrib.auth',
     'django.contrib.contenttypes',
     'django.contrib.sessions',
     'django.contrib.messages',
-    'django.contrib.staticfiles',
     'app'
 ]
 
 MIDDLEWARE = [
-    'django.middleware.security.SecurityMiddleware',
-    'django.contrib.sessions.middleware.SessionMiddleware',
-    'django.middleware.common.CommonMiddleware',
-    'django.middleware.csrf.CsrfViewMiddleware',
-    'django.contrib.auth.middleware.AuthenticationMiddleware',
-    'django.contrib.messages.middleware.MessageMiddleware',
-    'django.middleware.clickjacking.XFrameOptionsMiddleware',
+    #'django.middleware.security.SecurityMiddleware',
+    #'django.contrib.sessions.middleware.SessionMiddleware',
+    #'django.middleware.common.CommonMiddleware',
+    #'django.middleware.csrf.CsrfViewMiddleware',
+    #'django.contrib.auth.middleware.AuthenticationMiddleware',
+    #'django.contrib.messages.middleware.MessageMiddleware',
+    #'django.middleware.clickjacking.XFrameOptionsMiddleware',
 ]
 
 ROOT_URLCONF = 'snmpagent.urls'
@@ -70,32 +76,14 @@ WSGI_APPLICATION = 'snmpagent.wsgi.application'
 
 DATABASES = {
     'default': {
-        'ENGINE': config.get('MAINDB', 'ENGINE'),
-        'NAME': config.get('MAINDB', 'NAME'),
-        'USER': config.get('MAINDB', 'USER'),
-        'PASSWORD': config.get('MAINDB', 'PASSWORD'),
-        'HOST': config.get('MAINDB', 'HOST'),
-        'PORT': config.get('MAINDB', 'PORT'),
+        'ENGINE': "django.db.backends.postgresql_psycopg2",
+        'NAME': os.environ.get("MAINDB_NAME") if PRODUCTION else config.get('MAINDB', 'NAME'),
+        'USER': os.environ.get("MAINDB_USER") if PRODUCTION else config.get('MAINDB', 'USER'),
+        'PASSWORD': os.environ.get("MAINDB_PASSWORD") if PRODUCTION else config.get('MAINDB', 'PASSWORD'),
+        'HOST': os.environ.get("MAINDB_HOST") if PRODUCTION else config.get('MAINDB', 'HOST'),
+        'PORT': os.environ.get("MAINDB_PORT") if PRODUCTION else config.get('MAINDB', 'PORT'),
     }
 }
-
-# Password validation
-# https://docs.djangoproject.com/en/2.1/ref/settings/#auth-password-validators
-
-AUTH_PASSWORD_VALIDATORS = [
-    {
-        'NAME': 'django.contrib.auth.password_validation.UserAttributeSimilarityValidator',
-    },
-    {
-        'NAME': 'django.contrib.auth.password_validation.MinimumLengthValidator',
-    },
-    {
-        'NAME': 'django.contrib.auth.password_validation.CommonPasswordValidator',
-    },
-    {
-        'NAME': 'django.contrib.auth.password_validation.NumericPasswordValidator',
-    },
-]
 
 
 # Internationalization
@@ -103,7 +91,7 @@ AUTH_PASSWORD_VALIDATORS = [
 
 LANGUAGE_CODE = 'en-us'
 
-TIME_ZONE = config.get('system', 'TIME_ZONE')
+TIME_ZONE = os.environ.get("TIME_ZONE", "America/Sao_Paulo") if PRODUCTION else config.get('system', 'TIME_ZONE')
 
 USE_I18N = True
 

@@ -30,7 +30,7 @@ services:
       context: ./backend
     environment:
       - WEB_URL=${WEB_URL:-localhost}
-      - PYTHON_URL=${SNMPAGENT_URL:-http://localhost:8000}/snmpagent/
+      - PYTHON_URL=${SNMPAGENT_URL:-http://app-snmpagent:8000}/snmpagent/
       - APP_SECRET=${API_SECRET:-mysecert123}
       - PORT=3333
 
@@ -43,6 +43,22 @@ services:
       - MAINDB_NAME=${DB_NAME:-friendly-system}
     ports:
       - ${API_PORT:-3333}:3333
+    networks:
+      - fs_network
+  
+  app-snmpagent:
+    build:
+      context: ./snmpagent/
+    environment:
+      - PRODUCTION=True
+
+      - SECRET_KEY=${API_SECRET:-mysecert123}
+
+      - MAINDB_HOST=${DB_ADDR:-database}
+      - MAINDB_PORT=${DB_PORT:-5432}
+      - MAINDB_USER=${DB_USER:-postgres}
+      - MAINDB_PASSWORD=${DB_PASS:-somestrongpassword}
+      - MAINDB_NAME=${DB_NAME:-friendly-system}
     networks:
       - fs_network
 
