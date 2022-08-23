@@ -8,7 +8,7 @@ class CpeRxTxActualController {
         try {
             const erp_cpe_id = req.params.erp_cpe_id;
             const date = Date.now();
-            const { data } = await snmpApi.get('http://127.0.0.1:8000/snmpagent/ftth/cpe/signal?erp_cpe_id=' + erp_cpe_id);
+            const { data } = await snmpApi.get(`ftth/cpe/signal?erp_cpe_id=${erp_cpe_id}`);
             data.date = date;
 
             return res.json(data);
