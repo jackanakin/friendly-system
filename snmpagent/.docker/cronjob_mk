@@ -1,1 +1,1 @@
-* * * * * echo "Cron job MK Solutions" >> /var/log/cron.log 2>&1
+55 23 * * * python /opt/manage.py RunMkIntegrationCommand >> /var/log/cron.log 2>&1

@@ -38,6 +38,7 @@ export const addUser = {
             console.log(res);
 
             userInput.close();
+            process.exit(1);
         });
 
         userInput._writeToOutput = function _writeToOutput(stringToWrite: string) {
