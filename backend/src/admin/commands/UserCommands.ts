@@ -1,24 +1,16 @@
-import 'dotenv/config';
-import yargs from "yargs";
+import { CommandModule } from "yargs";
 import readline from "readline";
 
-import appConfig from '../_config/app';
-import '../_lib/database/main';
-
-import UserService from "./services/UserService";
-import CreateUserDTO from './@dto/user/CreateUserDTO';
+import CreateUserDTO from "../../app/@dto/user/CreateUserDTO";
+import UserService from "../../app/services/UserService";
 
 const userInput = readline.createInterface({
     input: process.stdin,
     output: process.stdout,
 }) as any;
 
-// custom version
-yargs.version('1.0.1');
-
-// add command
-yargs.command({
-    command: 'adduser',
+export const addUser = {
+    command: 'add-user',
     describe: 'Adicionar novo usuário',
     builder: {
         name: {
@@ -42,7 +34,7 @@ yargs.command({
         userInput.question(userInput.query, async (password: string) => {
             const user = { name, email, password } as CreateUserDTO;
             console.log(`\nAdicionando o usuário ${user.email}`);
-            const res = await UserService.createUser(user);
+            const res = await UserService.create(user);
             console.log(res);
 
             userInput.close();
@@ -55,11 +47,10 @@ yargs.command({
                 userInput.output.write(stringToWrite);
         };
     }
-});
+} as CommandModule;
 
-// delete command
-yargs.command({
-    command: 'deluser',
+export const delUser = {
+    command: 'del-user',
     describe: 'Removendo usuário',
     builder: {
         email: {
@@ -70,10 +61,18 @@ yargs.command({
     },
     async handler(argv) {
         const email = argv.email as string;
-        const res = await UserService.removeUser(email);
+        const res = await UserService.remove(email);
         console.log(res);
+        process.exit(1);
     }
-});
+} as CommandModule;
 
-// end of file
-yargs.parse();
+export const listUser = {
+    command: 'list-user',
+    describe: 'Listando usuários',
+    async handler(argv) {
+        const res = await UserService.list();
+        console.log(res);
+        process.exit(1);
+    }
+} as CommandModule;

@@ -3,23 +3,37 @@ import bcrypt from 'bcryptjs';
 
 import { User } from "../../_lib/database/main";
 import CreateUserDTO from '../@dto/user/CreateUserDTO';
+import ListUserDTO from '../@dto/user/ListUserDTO';
 
 class UserService {
-    async removeUser(userEmail: string): Promise<string> {
-        try {
-            await User.destroy({
-                where: {
-                    email: userEmail
-                }
-            });
 
-            return ("Usuário removido");
+    async list(): Promise<ListUserDTO[] | string> {
+        try {
+            const userList = (await User.findAll({
+                attributes: ["email", "name"]
+            })).map(ap => ap.toJSON() as ListUserDTO);
+
+            return userList;
         } catch (error: any) {
             return String(error);
         }
     }
 
-    async createUser(user: CreateUserDTO): Promise<string> {
+    async remove(userEmail: string): Promise<string> {
+        try {
+            const res = await User.destroy({
+                where: {
+                    email: userEmail
+                }
+            });
+
+            return `${res} usuário(s) removido(s)`;
+        } catch (error: any) {
+            return String(error);
+        }
+    }
+
+    async create(user: CreateUserDTO): Promise<string> {
         try {
             const schema = Yup.object().shape({
                 name: Yup.string().required(),
@@ -32,7 +46,7 @@ class UserService {
             });
 
             if (!(await schema.isValid(user))) {
-                throw new Error("Atributos inválidos!");
+                return "Atributos inválidos!";
             }
 
             const userExists = await User.findOne({
@@ -40,7 +54,7 @@ class UserService {
             });
 
             if (userExists) {
-                throw new Error("E-mail em uso!");
+                return "E-mail em uso!";
             }
 
             const password_hash = await bcrypt.hash(user.password, 8);
@@ -48,7 +62,7 @@ class UserService {
                 ...user, enabled: true, password_hash
             });
 
-            return ("Usuário criado");
+            return "Usuário criado";
         } catch (error: any) {
             return String(error);
         }

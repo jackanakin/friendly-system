@@ -1,7 +1,7 @@
 import { BuildOptions, DataTypes, Model, Sequelize } from "sequelize";
 
 export interface ApAttributes {
-    id: number;
+    id?: number;
     erp_id: number;
     description: string;
     oid_identification: string;

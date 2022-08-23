@@ -1,22 +1,22 @@
 {
   "name": "fs-backend",
-  "license": "Copyright © 2021 Jardel Kuhn (jackanakin) jardelkuhn@gmail.com",
+  "license": "UNLICENSED",
   "version": "1.0.0",
-  "main": "dist/index.js",
+  "main": "build/index.js",
   "homepage": "https://github.com/jackanakin/friendly-system",
   "scripts": {
-    "start": "node dist/app-server.js",
+    "start": "yarn run build:run:migration && node build/index.js",
 
     "build": "tsc",
     "build:run:migration": "sequelize db:migrate",
-    "build:admin:adduser": "node dist/app/admin.js adduser",
-    "build:admin:deluser": "node dist/app/admin.js deluser",
 
     "dev": "nodemon src/index.ts",
-    "new:migration": "npx sequelize-cli migration:generate --name",
-    "run:migration": "npx sequelize-cli db:migrate",
-    "admin:adduser": "nodemon src/app/admin.ts adduser",
-    "admin:deluser": "nodemon src/app/admin.ts deluser"
+    "dev:new:migration": "npx sequelize-cli migration:generate --name",
+    "dev:run:migration": "npx sequelize-cli db:migrate",
+
+    "dev:adduser": "nodemon src/admin/index.ts add-user",
+    "dev:deluser": "nodemon src/admin/index.ts del-user",
+    "dev:listuser": "nodemon src/admin/index.ts list-user"
   },
   "dependencies": {
     "axios": "^0.24.0",
