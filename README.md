@@ -16,6 +16,19 @@
 - [x] Integration with external ERP MK Solutions through SQL connection
 - [x] SNMP and SQL integrations are made using Python, website backend in NodeJS and frontend in ReactJS
 
+<p>Usefull CLI commands:</p>
+Enter the app-api container:
+>docker exec -it friendly-system-app-api-1 bash
+
+Listing available commands:
+>node build/admin/index.js --help
+Listing users:
+>node build/admin/index.js list-user
+Adding new user:
+>node build/admin/index.js add-user --name=Jardel --email=jardel@jk.com.br
+Removing existing user:
+>node build/admin/index.js del-user --email=jardel@jk.com.br
+
 <h1>Screenshots</h1>
 
 <p>OLT ONU list:</p>

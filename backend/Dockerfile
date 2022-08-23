@@ -11,6 +11,8 @@ COPY package.json tsconfig.json .sequelizerc tslint.json .
 RUN npm install
 RUN npm run build
 
+RUN rm -rf @types/ src/
+
 COPY .docker/entrypoint.sh .
 RUN ["chmod", "+x", "/opt/app/entrypoint.sh"]
 

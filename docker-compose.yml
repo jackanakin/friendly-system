@@ -32,7 +32,7 @@ services:
       - WEB_URL=${WEB_URL:-localhost}
       - PYTHON_URL=${SNMPAGENT_URL:-http://app-snmpagent:8000}/snmpagent/
       - APP_SECRET=${API_SECRET:-mysecert123}
-      - PORT=3333
+      - PORT=${API_PORT:-3333}
 
       - NODE_ENV=production
 
@@ -42,7 +42,7 @@ services:
       - MAINDB_PASS=${DB_PASS:-somestrongpassword}
       - MAINDB_NAME=${DB_NAME:-friendly-system}
     ports:
-      - ${API_PORT:-3333}:3333
+      - ${API_PORT:-3333}:${API_PORT:-3333}
     networks:
       - fs_network
   
@@ -59,6 +59,12 @@ services:
       - MAINDB_USER=${DB_USER:-postgres}
       - MAINDB_PASSWORD=${DB_PASS:-somestrongpassword}
       - MAINDB_NAME=${DB_NAME:-friendly-system}
+
+      - ERPDB_ADDRESS=${ERPDB_ADDRESS:-127.0.0.1}
+      - ERPDB_PORT=${ERPDB_PORT:-5432}
+      - ERPDB_USER=${ERPDB_USER:-postgres}
+      - ERPDB_PASSWORD=${ERPDB_PASSWORD:-somepassword}
+      - ERPDB_DATABASE=${ERPDB_DATABASE:-database}
     networks:
       - fs_network
 
